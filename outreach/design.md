@@ -46,6 +46,8 @@ To acces the services the configuration signed by guardian at entracnce link, le
 
 Uppon anonymous download with TOR over HTTPS the configuration file is stored locally and further all new configurarions are saved and verified with provided signature to ensure that guardian does not change.
 
+The next step for the participant is to synchronize locally `TransactionLog`. The `PeaceVote` package defines a `RemoteTransactionLog` which stores `TransactionLog`, the access point and path at which cache is stored. For server it provides a `serve` method. Similarly `PeaceVote` extends `KeyChain` with `StoredKeyChain` which extends the `braid!` method to include storage calls.
+
 ## Registration
 
 To register for the deme a public pseudonym locally is generated. Then a link is opened `mydeme.org/profile?id=1235` where `1235` is the pseudonym (hash of the public key). That would oppen the right profile page registration where email address could be filled in and validated and/or other means of identification. If registration had been succesfull it is shown in that page and the id is signed and added to `TransactionLog`.
@@ -58,4 +60,35 @@ To vote first one needs to get proposals. Uppon HTTP request `mydeme.org/proposa
 - entrance link as backup if `UUID` can not be resolved
 - hash of the proposal to download it locally
 
-# User Interface
+The proposal itself contains metadata:
+
+- `N` the state of the `TransactionLog` which determines pseudonym set who can participate in voting. (This is how double spending problem is solved).
+- Date of creation or update
+- Hash of parrent proposal in case updates had been made
+- A type of the proposal which is subtype of `AbstractProposal`. The type determines how the vote on it should be filled, votes counted and etc.
+- The metadata associated to the particular proposal type. How the votes shall be counted (like preferential way), time up to which votes can be delivered and etc.
+- The main body of the proposal containing its name, description and question(s) with possible choices.
+
+Filling out the proposal produces a vote. The `Vote` contains hash of the proposal and data produced making a vote in a `AbstractString` form. To improve clarity `TOML` will be used as the data format. 
+
+To cast the vote `N` of the proposal is used to choose the right pseudonym from the `KeyChain` to sign it. The vote and the signature is then delivered with TOR to `mydeme.org/vote` which if succesfull returns the server signature of the vote together with signature. That is stored locally together with vote to prove in case of dispue that the vote was delivered to the ballot box. In case the vote is not accepted by the server while still being valid it can be given to the third party to confirm the fact. (the next section discusees antibribery and coercion mechanisms).
+
+During or after the ballot (as specified in metadata of the proposal) all votes which were casted for the proposal can be downloaded from `mydeme.org/votes?pid=1332`. To count the votes a method `tally(proposal, votes)` which returns a subtype of `AbstractTally` which defines how the results shall be displayed on the screen. 
+
+## Antibribery and anticoercion mechanism
+
+There are two possible bribery/coercion mechanisms with the present system. The first one is that briber/coercer asks for a valid key of the pseudonym with which he/she could make votes himself. The second way is that briber/coercers asks to make a valid vote and give it to him/her before a delivery to the ballot box. Then the briber/coercer can cast the vote himself and check that it is sucesfully counted in the final tally.
+
+To prevent sharing of the keys a tamper resistant hardware such as smartcard can be used. To make sure that everyone is using a tamper resitstant hardware the registration protocol entails creation of a vendor certificate for the member pseudonym from a secret vendor key stored in the card. The certificate then is validated before the pseudonym gets added to `TransactionLog`. The braiding is performed as usual trusting that vendors provided protocol prevents extraction of secret keys.
+
+To prevent the second strategy where briber/coercer can cast the vote and observer that it is properly counted we can use a paper ballot as a backup strategy. At the voting station voter uses his pseudonym to sign a document stating that his vote is delivered as a paper ballot and then is allowed to enter voting booth to cast a vote. The last step for ellection officials is to count the paper ballot votes and discount any possible votes made by the pseudonyms which gave the paper ballot a priority. The final tally is published which is validated by independent auditors which keep participating pseudonyms in paper ballot confidential. Thus briber/coercer would never practially know whether the vote had been changed in the voting station.
+
+## Deploy
+
+A dcoker container could be used which uses PeaceVote and configures the service with in a Julia source file. 
+
+- The guardian key generation
+- The server key generation and key storage
+- Adding agents to `TransactionLog`
+
+## User Interface
