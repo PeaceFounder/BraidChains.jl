@@ -75,7 +75,7 @@ To cast the vote `N` of the proposal is used to choose the right pseudonym from 
 
 During or after the ballot (as specified in metadata of the proposal) all votes which were casted for the proposal can be downloaded from `mydeme.org/votes?pid=1332`. To count the votes a method `tally(proposal, votes)` which returns a subtype of `AbstractTally` which defines how the results shall be displayed on the screen. 
 
-## Antibribery and anticoercion mechanism
+# Antibribery and anticoercion mechanism
 
 There are two possible bribery/coercion mechanisms with the present system. The first one is that briber/coercer asks for a valid key of the pseudonym with which he/she could make votes himself. The second way is that briber/coercers asks to make a valid vote and give it to him/her before a delivery to the ballot box. Then the briber/coercer can cast the vote himself and check that it is sucesfully counted in the final tally.
 
@@ -83,7 +83,7 @@ To prevent sharing of the keys a tamper resistant hardware such as smartcard can
 
 To prevent the second strategy where briber/coercer can cast the vote and observer that it is properly counted we can use a paper ballot as a backup strategy. At the voting station voter uses his pseudonym to sign a document stating that his vote is delivered as a paper ballot and then is allowed to enter voting booth to cast a vote. The last step for ellection officials is to count the paper ballot votes and discount any possible votes made by the pseudonyms which gave the paper ballot a priority. The final tally is published which is validated by independent auditors which keep participating pseudonyms in paper ballot confidential. Thus briber/coercer would never practially know whether the vote had been changed in the voting station.
 
-## Deploy
+# Deploy
 
 A dcoker container could be used which uses PeaceVote and configures the service with in a Julia source file. 
 
@@ -91,4 +91,4 @@ A dcoker container could be used which uses PeaceVote and configures the service
 - The server key generation and key storage
 - Adding agents to `TransactionLog`
 
-## User Interface
+# User Interface
