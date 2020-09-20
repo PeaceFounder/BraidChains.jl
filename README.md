@@ -1,5 +1,5 @@
 
-# PseudonymBraids
+# BraidChains
 
 Authetification and anonimity does not merge well together and is a cornerstone for privecy preserving electroinc voting or electronic cash. Until now two approaches exist to solve the problem of anonymous authetification. Blind signatures allow creation of signatures of messages unliked to the person who asks them to the authorithy, with which one can have usual authetification. In contrast ring signatures allow creation of untracable signature locally on behalf of the group without involvment of the authorithy. Both schemes unfortunatelly are not directly applicable to electronivc voting where message is the vote and it is delivered with anonymous channel to ballot box.
 
@@ -17,6 +17,6 @@ This package implements the netwokr protocol which happens to be rather complex 
 
 ## Status
 
-Currently the API is almost finalized and is shown in the tests. The some code had already been written in `PeaceVote` package which needs to be upstreamed here. Some code would also need to be written. And lastly a proper docstrings needs to be written for the exported symbols as well as docs.
+-- Currently the API is almost finalized and is shown in the tests. The some code had already been written in `PeaceVote` package which needs to be upstreamed here. Some code would also need to be written. And lastly a proper docstrings needs to be written for the exported symbols as well as docs. -- 
 
-The protocol for braiding currently lacks code which would prevent for single memeber to spoil every braid and thus making the braiding service broken. Some blacklisting strategies of the pseudonyms needs to be thought about and implemented. Additionally a different braiders implemented by making participants of the braid part of the mixnet and thus making services easier to deploy. 
+All essentials of having a `BraidChain` and doing braiding had been implemented with seemingly reasonable API. Further development shall deal with implementation of deffence mechanisms to prevent adversary of making braiding service unavailble by spoiling. Some blacklisting strategies of the pseudonyms needs to be thought about and implemented. Additionally a different braiders implemented by making participants of the braid part of the mixnet and thus making services easier to deploy. Additionaly startegies such as braid control adversary could use to reveal the identity of the pseudonym which also seems possible to deffend by adding a threshold on the anonmity gain which pseudonyms should gain in every braiding step.
