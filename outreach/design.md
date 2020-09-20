@@ -1,3 +1,13 @@
+# Update 20/09
+
+Currently a lot of packages had been already registered with the Julia package registry. Some of thoose packages will change behavior:
+
+- `Synchronizers` shall only be concerned on synchronization of anything which supports `Tables` interface
+- `Recruiters` an HTTP server components which allows to register to a system by filling a WEB form and confirming email address with a link as it is often practiced.
+
+Package `PeaceFounder` will provide electronic voting solution dealing with registration, synchronization, storage, vote casting and voting with HTTP and thus would be an end user application. Previosuly this role was filled by `PeaceVote`, due to a larger ambition of building a new ways of using internet. As the aims of that project started to become vague, the project for the sake of focus is currently dropped and thus also `DemeNet` package is stalled. The `PeaceVote` package name will be used to implement all different sorts of proposals and how one can count votes on them. 
+
+
 # Summary
 
 PseudonymBraids protocol allows to create a list of anonymous while legitimate pseudonyms which can be aplied to voting. This design works out details on how to interface the package to provide a remote electronic voting solution for the masses. The necessary components which shall be discussed is registration, syncronization, voting including casting and lastly counting.
