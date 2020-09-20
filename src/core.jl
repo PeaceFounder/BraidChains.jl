@@ -1,16 +1,16 @@
-struct Guardian{ID} <: Agent 
+struct Guardian <: Agent 
     id::ID
 end
 
-struct Registrator{ID} <: Agent
+struct Registrator <: Agent
     id::ID
 end
 
-struct Member{ID} <: Agent
+struct Member <: Agent
     id::ID
 end
 
-struct Braider{ID} <: Agent 
+struct Braider <: Agent 
     id::ID
 end
 
@@ -29,7 +29,7 @@ Transaction(x, s::Signer) = Transaction(x, sign(x, s))
 ### For each pseudonym I could also keep track of anonymity set size
 ### That could be something to consider in the future
 
-struct State{ID}
+struct State
     guardian::ID
     members::Set{ID}
     pseudonyms::Set{ID}
@@ -37,8 +37,7 @@ struct State{ID}
     braiders::Set{ID}
 end
 
-State{ID}(guardian::Guardian{ID}) where ID = State(guardian.id,Set{ID}(),Set{ID}(),Set{ID}(),Set{ID}())
-State(guardian::Guardian{ID}) where ID = State{ID}(guardian)
+State(guardian::Guardian) = State(guardian.id,Set{ID}(),Set{ID}(),Set{ID}(),Set{ID}())
 
 function Base.push!(state::State, registrator::Registrator)
     push!(state.registrators, registrator.id)    
@@ -53,7 +52,7 @@ function Base.push!(state::State, braider::Braider)
     push!(state.braiders, braider.id)
 end
 
-function Base.push!(state::State{ID}, braid::Braid, signers::Vector{ID}) where ID
+function Base.push!(state::State, braid::Braid, signers::Vector{ID}) 
     for signer in signers
         pop!(state.pseudonyms, signer)
     end
@@ -66,32 +65,111 @@ end
 
 # Validation of power of the signer to add an element of the sort. Also validates that something like dublicate is not beeing added.
 
-function validate(state::State{ID}, registrator::Registrator{ID}, signer::ID) where ID 
+function validate(state::State, registrator::Registrator, signer::ID)
     if registrator.id in state.registrators return false end
     return signer == state.guardian
 end
 
-function validate(state::State{ID}, member::Member{ID}, signer::ID) where ID
+function validate(state::State, member::Member, signer::ID) 
     if member.id in state.members return false end
     return signer == state.guardian || signer in state.registrators
 end
 
-function validate(state::State{ID}, braider::Braider{ID}, signer::ID) where ID
+function validate(state::State, braider::Braider, signer::ID) 
     if braider.id in state.braiders return false end
     return signer == state.guardian 
 end
 
 
+
+# struct Transactions
+#     transactions::Vector{Transaction}
+# end
+
+# Tables.is
+
+### I could add a Trigger as a layer for an array
+
+abstract type TransactionLog end
+
+Base.lastindex(t::TransactionLog) = length(t)
+
+
+### This one is necessary to implement a validation validation check of existing transactions which could happen in the BraidChain constructor. Incidetally that would also is necessary to obtain the state for the BraidChain.
+mutable struct TransactionHole <: TransactionLog 
+    n::Int
+end
+
+### Need to think about what to do with hash!
+TransactionHole() = TransactionHole(0)
+
+Base.length(t::TransactionHole) = t.n
+
+function Base.push!(tlog::TransactionHole, t::Transaction)
+    tlog.n += 1
+    return nothing
+end
+
+
+### A simple implementation for a list of transactions stored in memory
+struct TransactionVector <: TransactionLog
+    transactions::Vector{Transaction}
+end
+
+TransactionVector() = TransactionVector(Transaction[])
+
+Base.length(t::TransactionVector) = length(t.transactions)
+Base.push!(tlog::TransactionVector, t::Transaction) = push!(tlog.transactions, t)
+Base.getindex(t::TransactionVector, i::Int) = t.transactions[i]
+Base.getindex(t::TransactionVector, r::UnitRange{Int}) = t.transactions[r]
+Base.iterate(t::TransactionVector) = iterate(t.transactions)
+Base.iterate(t::TransactionVector, i::Int) = iterate(t.transactions, i)
+
+
+struct Trigger{T <: TransactionLog} <: TransactionLog
+    transactions::T
+    trigger::Function
+end
+
+Base.length(t::Trigger) = length(t.transactions)
+
+function Base.push!(tlog::Trigger, t::Transaction) 
+    tlog.trigger(t)
+    push!(tlog.transactions, t)
+end
+
+Base.getindex(t::Trigger, i::Int) = getindex(t.transactions, i)
+Base.getindex(t::Trigger, r::UnitRange{Int}) = getindex(t.transactions, r)
+
+Base.iterate(t::Trigger) = iterate(t.transactions)
+Base.iterate(t::Trigger, i::Int) = iterate(t.transactions, i)
+
 # Before one pushes the state it is necessary to validate. On the other hand if validation had already bben done then push! as a raw thing makes sense for recovery of intermidiate states.
 
 
 struct BraidChain 
-    transactions::Vector{Transaction}
+    transactions::TransactionLog #Vector{Transaction} ### Table
     notary::Notary
     state::State
 end
 
-BraidChain(guardian::Guardian{ID}, notary::Notary) where ID = BraidChain(Transaction[],notary,State{ID}(guardian))
+function BraidChain(t::TransactionLog, guardian::Guardian, notary::Notary) # ;validate=true 
+
+    tvector = TransactionVector() ### for TransactionHole we need to think how to keep hash. 
+    bc = BraidChain(tvector, notary, State(guardian))
+    
+    for ti in t
+        push!(bc, ti)
+    end
+
+    @assert length(tvector)==length(t)
+    
+    return BraidChain(t, notary, bc.state)
+end
+
+
+
+state(bc::BraidChain) = bc.state
 
 
 Tables.istable(::Type{BraidChain}) = true

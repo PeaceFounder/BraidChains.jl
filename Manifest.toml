@@ -127,9 +127,9 @@ version = "0.2.4"
 
 [[PeaceCypher]]
 deps = ["CryptoGroups", "CryptoSignatures", "DiffieHellman", "Nettle", "Pkg", "Random", "SecureIO", "Sockets"]
-git-tree-sha1 = "c0b33dcb6190d4c8ac5b42efc8101a796e5ca70a"
+git-tree-sha1 = "a337baaf59008c93f92077fbc4aa9e2fa8d37837"
 uuid = "7743456c-e0c5-4477-a2b6-196c240b0368"
-version = "0.3.3"
+version = "0.3.5"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
@@ -193,9 +193,9 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[SynchronicBallot]]
 deps = ["Multiplexers", "PeaceCypher", "Sockets"]
-git-tree-sha1 = "4c3d131ce2c2bed083d80b52f5363321ed7a23a1"
+git-tree-sha1 = "3c0150e2e510f85981639423c5e82af75b9ad2ef"
 uuid = "c4fd2470-c9f5-491f-b4e2-53b9059945a5"
-version = "0.4.0"
+version = "0.4.1"
 
 [[TableTraits]]
 deps = ["IteratorInterfaceExtensions"]

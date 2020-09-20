@@ -2,7 +2,7 @@
 
 function fold(dict::Dict)
     io = IOBuffer()
-    TOML.print(io,Dict(s))
+    TOML.print(io, dict)
     return take!(io)
 end
 
@@ -24,14 +24,14 @@ function PeaceCypher.verify(document, c::Contract, notary::Notary)
     return true
 end
 
-struct Mixer{ID} <: Agent 
+struct Mixer <: Agent 
     mixer::ID
 end
 
 
 struct MetaData
-    mix::BigInt
-    gk::BigInt
+    mix::ID
+    gk::ID
     hash::Hash
 end
 
@@ -51,23 +51,25 @@ function MetaData(dict::Dict)
     N = dict["N"]
     hash = parse(BigInt, dict["hash"], base=16)
 
-    return MetaData(mix, gk, Hash(N, hash))
+    return MetaData(ID(mix), ID(gk), Hash(N, hash))
 end
 
-struct SynchronicBraid{ID} <: Braid
+struct SynchronicBraid <: Braid
     metadata::MetaData
     pseudonyms::Vector{ID}
 end
 
 function SynchronicBraid(ballot::Ballot)
     metadata = MetaData(unfold(ballot.metadata))
-    pseudonyms = BigInt[]
-    for i in size(ballot.votes, 1)
-        bytes = ballot.votes[i,:]
+    pseudonyms = ID[]
+    
+    for i in 1:size(ballot.votes, 2)
+        bytes = ballot.votes[:,i]
         str = String(copy(bytes))
         id = parse(BigInt, str, base=16)
-        push!(pseudonyms, id)
+        push!(pseudonyms, ID(id))
     end
+
     return SynchronicBraid(metadata, pseudonyms)
 end
 
@@ -83,7 +85,7 @@ end
 
 pseudonyms(braid::SynchronicBraid) = braid.pseudonyms
 
-function validate(state::State{ID}, braid::SynchronicBraid, signers::Vector{ID}) where ID
+function validate(state::State, braid::SynchronicBraid, signers::Vector) 
 #    @infiltrate
     # for id in braid.pseudonyms
     #     id in state.pseudonyms || return false
