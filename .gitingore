@@ -1,3 +1,5 @@
-/outreach/protocol
-!/outreach/protocol/braidchains.pdf
-!/outreach/protocol/braidchains.tex
+*.aux
+*.log
+*.el
+*.out
+
