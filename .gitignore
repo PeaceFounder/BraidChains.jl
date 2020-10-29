@@ -1,5 +1,5 @@
-#*.aux
-#*.log
-#*.el
-#*.out
+*.aux
+*.log
+*.el
+*.out
 
