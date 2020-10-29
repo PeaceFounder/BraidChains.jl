@@ -17,6 +17,6 @@ This package implements the netwokr protocol which happens to be rather complex 
 
 ## Status
 
--- Currently the API is almost finalized and is shown in the tests. The some code had already been written in `PeaceVote` package which needs to be upstreamed here. Some code would also need to be written. And lastly a proper docstrings needs to be written for the exported symbols as well as docs. -- 
+Currently the API is almost finalized and is shown in the tests. A proper docstrings needs to be written for the exported symbols as well as docs.
 
 All essentials of having a `BraidChain` and doing braiding had been implemented with seemingly reasonable API. Further development shall deal with implementation of deffence mechanisms to prevent adversary of making braiding service unavailble by spoiling. Some blacklisting strategies of the pseudonyms needs to be thought about and implemented. Additionally a different braiders implemented by making participants of the braid part of the mixnet and thus making services easier to deploy. Additionaly startegies such as braid control adversary could use to reveal the identity of the pseudonym which also seems possible to deffend by adding a threshold on the anonmity gain which pseudonyms should gain in every braiding step.
