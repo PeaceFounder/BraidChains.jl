@@ -5,6 +5,9 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{cleveref}
+\usepackage{setspace}
+\usepackage{booktabs}
+
  
 \newenvironment{theorem}[2][Theorem]{\begin{trivlist}
 \item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
@@ -24,7 +27,6 @@
 \newlist{steps}{enumerate}{1}
 \setlist[steps, 1]{label = {\bf step \arabic*}}
 
-
 \begin{document}
 
 % --------------------------------------------------------------
@@ -37,6 +39,123 @@
 
 \maketitle
 
+
+\section*{Introduction}
+
+In a remote electronic voting system, the difference between personalised hardware which does cryptographic operations and the voter starts to get blurred. I sci-fi future we may experience cryptographic implants accelerating our brainpower on such mundane operations or citizens who are no longer considered humans. In this respect, I propose to consider voter as a cryptographically capable being who owns pseudonyms and can protect secrets. A way to ensure that the voter is responsible for protecting his secrets and pseudonyms is an orthogonal issue to the remote electronic voting system, which I shall address later.
+
+Having defined the voter that way allows us to differentiate between software and it's users. It is particularly important to acknowledge that an adversary can write software in any step. Furthermore, it is exceedingly more difficult to audit the software which runs in a complex environment defined with the operating system and its hardware. Instead, as Ron Rivest proposes we shall focus on auditing the evidence which proves that any modification in the software had not been able to make an undetected change in the election result which is called software independence.
+
+Software independence is a necessary property for trustworthy elections but is not sufficient for a case when election outcome or its integrity evaluation falls in hands in a few auditors. In a paper ballot, the number of auditors is limited by physical factors, like counting speed, area of the place and geographic location. As they become so remote from society, how one would ensure that they are trustworthy and are not taking part in sabotaging elections with election officials? It would sound absurd to put a law in law in place which punishes dishonest auditors and thus makes them fearful of their integrity as a potentially corrupt state has the power defining honesty where the vital property is representativeness. The consequences of one corrupt auditor who announces that elections are rigged could be enough to paralyse the democracy.
+
+It is thus of great importance to make the evidence public so anyone could audit the integrity, accuracy and fairness of the elections. Additionally, a small adversary coalition shall not be able to produce valid evidence either during or after the election process; otherwise, they become de facto auditors. Therefore we shall require that each voter takes part in making valid evidence and so the third party does not need to be trusted.
+
+At the same time, the published evidence can't reveal or allow to infer the choice of each voters identity which would allow a mass scale bribing, coercion and shaming making voters fearful of expressing their true choice. Besides, it is important to ensure that it is hard for an adversary to record additional information, for example, from mixes, which can compromise privacy. Thus we require that the evidence also allows estimating how hard it could have been for an adversary to do that in particular elections. To summarise for a trustworthy remote electronic voting, we shall require the following properties:
+
+\begin{itemize}
+\item Accountability. The evidence of a ballot conclusively proves legitimacy, accuracy and fairness of the ballot. Only controlling the voter either in person or through malware adversary can change or vote in place of voter producing valid evidence. A small adversary coalition can not paralyse the voting system without being made accountable and isolated. 
+  
+\item Transparency. The evidence of the ballot is public for anyone to audit without requiring to trust a third party. In other words, the evidence can't be produced by a small adversary coalition either during the voting process or after that. 
+  
+\item Privacy. The published evidence does not reveal or allow to infer identities of voters making a particular vote. The voting protocol does not allow an adversary to record additional privacy revealing data without producing suspicious evidence.
+\end{itemize}
+
+Most of the voting systems on the literature consider a rather peculiar adversary model where certain parts of the protocol are trusted for verifiability. For instance, a voter could get a casting assurance (individual verifiability), and ability to validate that only eligible voters had participated, they had voted once, and that the votes had been counted accurately (universal verifiability).  Nevertheless, for assurances, the voter would still need to trust the verifying system as all data for validation can't be published to protect voters privacy which is thus not transparent.
+
+A similar situation is present for ensuring the anonymity of the vote. The anonymity preserving system, for example, a mixnet cascade is often assumed to be held private to avoid malicious activities which can result in the absence of election results. Nevertheless, if we need to trust private mixes, the system, although it is more disperse it, is still centralised. Additional data revealing anonymity can be recorded (as long as authentification is part of a private system) and the organisation can generate necessary proofs of fair elections. Can we avoid those issues in the electronic voting system design?
+
+The success of TOR shows that decentralised anonymous network of mixnet cascades can exist allowing to resist government censorship and hiding identity as Edward Snowden from the USA. Other approaches based on mixnets, crowds, onion routing, dc nets are actively developed and deployed. The anonymity of such systems is guaranteed from a realistic point of view of the adversary who would not be able to control every ISP of the world to deanonymise the traffic or control every node providing mix services. Thus with the delocalisation and companionship, we can already today use quite strong means to exchange messages anonymously. However, anonymous message channels yet do not allow to avoid tracking. Unless the electronic voting is an anonymous pool where anyone can vote multiple times (thus not accountable), the election voting system is going to have authentification. 
+
+Two approaches exist to solve the problem of anonymous authentication. Blind signatures allow the creation of signatures of messages unliked to the person who asks them to the authority, with which one can have usual authentication. In contrast, ring signatures allow the creation of untraceable signature locally on behalf of the group without involvement of the authority. Both schemes, unfortunately, are not directly applicable to electronic voting where the message is the vote, and it is delivered with an anonymous channel to the ballot box.
+
+Particularly for a blind signature scheme, there are two profound issues. In the process of signature generation, the user may abort the protocol. Is it because a network connection failed or because the user has malicious intentions of obtaining two votes? The second issue is that the blind signature issuer is not accountable. It can maliciously issue additional signed votes as long as some voters abstain from elections, which often is quite a large population, without leaving any traces. A straightforward extension here would be to involve multiple parties forming a blind contract (each party makes a blind signature) if absolute consent is reached.
+
+For a ring, signature scheme with an extension of linkability is not practical. Substantial computational resources are needed to make ring signatures, which are large and scales poorly with the size of the group. Thus unless anonymity set size is relaxed, grouping randomised in advance this scheme currently is not practical. Although amazingly it has found a place in cryptocurrencies such as Monero, ZCash, ZCoin (in the form of zero-knowledge proofs) for guaranteeing transaction anonymity
+multiple currency inflation events for ZCoin makes us doubt the cryptographic protocols/primitives used. 
+
+Coins as signatures, handwriting, phone number, IP addresses and as well with private keys, are in general means to authenticate which we shall refer as pseudonyms. Thus astonishingly follows that the anonymisation of coins is equivalent to the anonymisation of the voters themselves. The anonymisation of pseudonyms had been explored previously with mix services such as VANET and CoinShuffle.  In vehicular networks, the authority would benefit from knowing information on infrastructure quality for further improvement where mix zones for changing pseudonyms is currently actively studied to protect the privacy of the car owners. But as in CoinShuffle requires to trust the third party not to steal your pseudonym.
+
+To avoid trusting the third party, we could extend any ballot protocol with contract formation between all involved parties who would each individually check the resulting ballot to contain their new pseudonyms and make a signature on that if they approve that. Alternatively, one can perform a Secret Santa protocol to obtain the same result in fewer steps and with more privacy. However, such protocols do suffer from a requirement that every participant is honestly following the protocol and fail miserably if one participant is an adversary and thus is extremely fragile. It is inconvenient that to perform pseudonym change, all participants must be online at the same time, which makes it unpractical in real-life situations. On the other hand, such pseudonym anonymisation can be done with basic cryptography and as aborts can be resolved at any step.
+
+To solve the issue of fragility and inconvenience, I propose to do anonymisation it in multiple small trustless ballots which I shall refer as braids. A benefit of such additional complexity is that the pseudonym can be used to authorise a new pseudonym anonymously allowing to increase the anonymity set size incrementally and thus a number of participants in each run can be small. This process I call a pseudonym braiding which in the result forms a secure knot (braid). The braids are stored in a public transaction log, allowing to fix the state of the system for external applications such as voting.
+
+In contrast to ZeroCoin and ZeroCash protocols where there is a shared pool where coins (pseudonyms) are mined and then claimed a pseudonym braiding solves crucial issues. At any time a ballot proposer can select a row counter in the transaction log to specify all eligible pseudonyms deterministically allowing concurrency in voting between different proposals. Anonymity set for each member is deterministic, and thus multiple braidings can be enforced before a member is allowed to vote. That prevents an adversary from using correlations between mining and claiming to infer properties of a subgroup of members which could allow an adversary to target them differently than others in the next elections. These issues can be easily solved in ZeroCoin and ZeroCash protocols by isolating mining and claiming pools which in addition would allow auditing the used cryptographic protocols/primitives. However, it is still computationally expensive and a public blockchain distributed between peers is controversial where both I show can be avoided with more interactivity.
+
+The usual electronic voting protocols which focus on anonymising the votes over voters are arguably less complex over a voting system which requires braiding before voting. Nevertheless, I show that the braiding protocol needs to be executed on an average only logarithmic number of times for each member to get close to absolute anonymity of the generated pseudonyms. In addition, a full transaction log does not need to be stored locally, and no waste is generated, which thus scales well. Furthermore, local operations can be performed in a low cost certified hardware making the electronic voting protocol also malware resistant. At the same time, coercion/bribing resistance can be provided with an additional paper ballot to which members authenticate in secret with their braided pseudonym providing receipt freeness.
+
+
+% In a remote electronic voting system the difference between a personalized hardware which does cryptographic operations and the voter starts to get blured. I sci-fi future we may experience cryptographic implants accelrating our brain power on such mundane operations or citizens who are no longer considered humans. In this repect I propose to consider voter as a cryptographicaly capable being who owns pseudonyms and can protect secrets. A way to ensure that the voter does protect his secrets and owns the pseuodnyms is an orthognal issue to the remote electronic voting system, which I shall address later.
+
+% Having dfined the voter that way allows us to clearly differentiate between software and it's users. It is partciularly important to acknowledge that software in any step can be written by an adversary. In addition it is exceedingly more difficult ot audit the software which runs in a complex evironment defined with operating system and its hardware. Instead as Ron Rivest proposes we shall focus on auditing the evidence whihch proves that any modification in the software had not been able to make an undetected change in the ellection result which is called a software independance.
+
+% The software independance is necessary propertyu, howerver, it is not enough for a case when ellection outcome or its integrity evaluation falls in hands in a few auditors which is exceedingly smaller number than that in a paper ballot system which is limited by a physical factor, like counting speed, area of place and geographic location. As they become so remote from society, how one would ensure that they are trustworthy and are not taking part of sabotaging ellections with ellection officials? It would sound absurd to put a law in a law in place which punishes dishonest auditors and thus makes them fearful of their integrity as a potentialy corrupt state has the power defining honesty where important property is reperesentativness. The consequences of one corrupt auditor who anounces riggedness of elections could be enough to paralize the democracy.
+
+% It is thus of a great importance to make the evidence public so anyone could audit integrity, accuracy and fairness of the ellections. Also a small adversary coalition shall not be able to produce a valid evidence either during or after the ellection process otherwise they become de facto auditors. Therefore we shall require that each voter takes part in producing a valid evidence and so the third party does not need to be trusted.
+
+% At the same time the publishwd evidence can't reveal or allow to infer the choice of each voters identity which would allow a mass scale bribing, coercion and shaming making voters fearful of expressing their true choice. In addition it is important that to ensure that it is hard for adveradsry to record additional infomration, for example, from mixes, which can compromise privacy and thus we require that the evidence also allows to estimate how hard it could have been for adversary to do that in particular ellections. To sumarize for a trustowrthy remote electronic voting we shall require a following properties:
+
+% \begin{itemize}
+% \item Acountability. The evidence of a ballot conclusevly proves legitimacy, accuracy and fairness of the ballot. Only contoling the voter either in person or through malware adversary can change or vote in place of voter producing a valid evidence. A small adversary coalition can not paralize the voting system without being made accountable and isolated. 
+  
+% \item Transparency. The evidence of the ballot is public for anyone to audit without requiring to trust a third party. In other words the evidence can't be produced by a small adversary coalition either during the voting process or after that. 
+  
+% \item Privacy. The published evidence does not reveal or allow to infer identities of voters making a certain vote. The voting protocol does not allow adverasary to record additional privacy revealing data without producing a suspicious evidence.
+% \end{itemize}
+
+% Most of the voting systems on the literature consider a rather peculiar adversary model. When the voting protocol is modelled as a process, certain parts of the protocol are trusted for verifiability. So voter could get a casting assurance (individual verifiability), and able to validate that only eligible voters had participated, they had voted once, and that the votes had been counted accurately (universal verifiability), but he/she still would need to trust the verifying system as all data for validation can’t be published to protect voters privacy which is thus not transparent.
+
+% A similar situation is present for ensuring the anonymity of the vote. The anonymity preserving system, for example, a mixnet cascade is often assumed to be held private to avoid malicious activities which can result in the absence of election results. Nevertheless, if we need to trust private mixes, the system although is more disperse it is still centralised. Additional data revealing anonymity can be recorded (as long as authentification is part of a private system) and the organisation can generate necessary proofs of fair elections. Can we avoid those issues in the electronic voting system design?
+
+% The success of TOR shows that decentralised anonymous network of mixnet cascades can exist allowing to resist government censorship and hiding identity as Edward Snowden from the USA. Other approaches based on mixnets, crowds, onion routing, dc nets are actively developed and deployed. Anonymity of such systems is guaranteed from a realistic point of view of the adversary who would not be able to control every ISP of the world to deanonymize the traffic or control every node providing mix services. Thus with the delocalisation and companionship, we can already today use quite strong means to exchange messages anonymously. However, anonymous message chanels yet do not allow to avoid tracking. Unless the electronic voting is an anonymous pool where anyone can vote multiple times (thus not accountable), the election voting system is going to have authentification. 
+
+% Two approaches exist to solve the problem of anonymous authetification. Blind signatures allow creation of signatures of messages unliked to the person who asks them to the authorithy, with which one can have usual authetification. In contrast ring signatures allow creation of untracable signature locally on behalf of the group without involvment of the authorithy. Both schemes unfortunatelly are not directly applicable to electronivc voting where message is the vote and it is delivered with anonymous channel to ballot box.
+
+% Particularly for blind signature scheme there are two profound issues. In the process of signature generation the user may abort the protocol. Is it because network connection failed or because user has malicious intentions of obtaining two votes? The second issue is that the blind signature issuer is not accountable. It can maliciously issue additional signed votes as long as some voters abstain from elections, which often is quite a large popoulation, without leaving any traces. An eassy extension here would be to involve multiple parties forming a blind contract (each party makes a blind signature) if absolute consent is reached.
+
+% For a ring signature scheme with extension of linkability is not practical. To make a signature a substational computational resources are needed and signatures are large scaling with the size of the group. Thus unless anonimity set size is relaxed, grouping randomized in advance this scheme currently is not practical. Although amazingly it have found place in cryptocurrencies such as Monero, ZCash, ZCoin for guaranteeing transaction untracability in a much more complex protocol, but particulary for ZCoin there have been multiple currency inflation events making us to doubt the cryptographic protocols/primitives used. Also for BitCoin a service CoinShuffle is implemented as an additional mix service, but requires to trust it to not steal your coin. 
+
+% In a remote electronic voting context the anonimization of coins in thoose privacy preserving cryptocurnecies is analogous of anonimization of voters and anonimization of vehicles in VANET. In general thoose all are means to authetificate which we shall reffer as pseudonyms. In vehicular networks, the authority would be a benefit to know information on infrastructure quality for further improvement where mix zones for changing pseudonyms is currently actively studied to protect privacy of the car owners. But as in CoinShuffle requires to trust the third party.
+
+% To avoid trusitng third party we could extend any ballot protocol with contract formation between all involved parties who would each individually would check the resulting ballot to contain their new pseudonyms and make a signature on that if they approve that. Alternatively, one can perfomr a Secret Santa protocol to obtain the same result in less steps and with more privacy. However, such protocols do suffer from requirement that every participant is honestly following the protocol and fail miserably if one participant is adverasry and thus is extremely fragile. Inconvinietn is that to perform pseudonym change all participants must be online at the same time which makes it unpractical in real life situations. On the other hand such pseudonym annimization can be done with basic cryptography and as aborts can be resoved at any step.
+
+% To solve the issue of fragility and inconvinience, I propose to do anonimization it in a multiple small trustless ballots which I shall reffer as braids. A benefit of such additional complexitiy is that the pseudonym can be used to authorize a new pseudonym anonymously allowing to increse the anonimity set size incrimentally and thus number of participants in each run can be small. This process I call a pseudonym braiding whihc in the result forms untiable knot (braid). The braids are stored in a public transaction log allowing to fix the state of the system for external applications such as voting.
+
+% Arguably the process is more complex in contrast to usual electronic voting protocols which focus on anonimizing the votes over voters. However, I show that the protocol needs to be executed on average only logarithimc number of times for each member to get close to absolute anonimity of teh generated pseudonyms. In addition full transaction log does not need to be stored locally and no waste is generated which thus scales well. Furthermore local operations can be performed in a low cost certified hardware making the electronic voting protocol also malware resitant. Wheras coercion/bribing resistance can be provided with additional papaer ballot to which memebers authetificate in secret with their braided pseudonym provciding receipt freeness.
+
+% In contrast to ZeroCoin and ZeroCash protocols where there is a coommon pool where coins (pseudonyms) are mined and then claimed the prospoed braiding protocol solves two important issues. First of all how one can fix a set of pseudonyms who are eligiable for voting if some of them are still mining? An obvious fix would be to block mining during the voting phase, which adds another step in the complex process. In contrast, braiding can happpen completely independent from voting as eelection official always can fix the set of pseudonyms determinsticially by specify a counter of buletin board when publishing a proposal which allows concurency in voting. Additionally there is an inevitable corelation between mining and claiming coins which although does not interfere with the anonimity of a single individual it can help adversary to infer properties of a subgroup off people who had made aparticular choice and thus target them differently than others in the next ellections. A simple fix would be if each individual would mince coins multiple times but us hardly enforcable due to probabilistic nature of anonymity set. In braiding protocol the problem is solved by making anonymity set of each pseudonym deterministic allowing to enforce braiding in certain ways and times before voting guranteeing that no data on subgroups would be inferable. 
+
+
+%each memeber who wants to participate in voting 
+
+%whic allows  a theshold condition for every memeber who wants to vote. 
+
+%as an necessary condition for participating in a voting. 
+
+
+
+%An attractive solution would be to use linkable ring signature scheme, sign the votes with that and deliver to the vote recorder with an anonymous channel. Unfortunately, linkable ring signatures suffer from their length and computational requirements and thus are not practical.
+
+%Lately anonimization of voters instead of votes 
+
+
+%Therefore for a sound system, we shall focus anonymisation of pseudonyms which can be used for authentification of voting
+%messages.
+
+
+%It is customary in electronic voting system literature to work on ways to anonimize the vote made by a registered voter. On the other hand lectronic voting protocols which anonimize the voter in advance before the vote are rarely considered (see Secret Santa protocol and refernces for example) arguably because it involves more steps for the voter who on average would not be able to follow the process and no beenfit of doingn that had been articulated. 
+
+
+%An exception to that is a Secret Santa a multiparty protocol which allows to exchange presents publicly while remaining anonymous, and could be similarlty used in voting. 
+
+% 
+% A secret ballot made
+% Fragile, Third party trust
+
+\section*{Mathematical model of Braiding}
+
+\subsection*{Anonimity Set}
+
+To mathematically model the anonimization of the voter we shall introduce a notion of a pseudonym as a general means for authentification:
 \begin{definition}{(pseudonym)} 
 A pseuodnym $p$ is a means to authetification for a particular {\bf owner} with an unique and public {\bf identifier}.
 \end{definition}
@@ -95,7 +214,7 @@ Most of the time when talking about anonymity, the probability theory can be use
   \end{equation}
 \end{definition}
 
-\section*{Braiding}
+\subsection*{Estimation of effectiveness}
 
 \begin{definition}{(member)}
   A pseudonym $p \in P$ is a member if it has access and can authenticate to a particular service.
@@ -192,132 +311,179 @@ Nevertheless, the adversary could attempt to game the system in a way that all p
 
 One of the most effective policies seems to be not to allow to braid one member consecutively but require that between braids some $K$ members had braided in between. In this way, if adversary controls less than $K$ members, others remain anonymous for the adversary in spite of collected information. Another method could be to require that every participant from the braid makes about equal anonymity set size gains and thus excluding adversary as his controlled members would have a finite capacity to participate in a low gain braidings. 
 
-\section*{Braiding protocol overview}
 
-\subsection*{Assumptions and Properties}
+\section*{Braiding System}
 
+The goal of the braiding protocol is to produce new pseudonyms for members with larger anonymity sets than the one with which member authenticated. Repeating the protocol multiple times would give large enough anonymity which could then be used to sign votes and to send them over an anonymous channel to a collection site (voting box). At the same time, no member should lose his/her membership if any or all other agents in the protocol conspire against him/her. The braiding protocol should succeed on average if a following set of assumptions are satisfied:
 \begin{itemize}
-\item The clocks of honest participants are synchronized and the correct time can be btained with $time()$.
-\item Secure cryptographic primitives $hash$, $HMAC$, $sign$, $verify$, $randint$.
-\item Client software is free from malware/spyware. Breaking this assumption could end up losing the keys of the affected\footnote{Signing and key generation could be done on a seperate certified hardware whhc then would protect keys from being extracted.} and would compromise the privacy of the individual;
-\item The mixes uses the same cryptographic parameters as the systems using their services. This assumptions is neceessary to make the protocol as coincise as possible.
-\item The pseudonym identifier is $G^p$ where $G$ is a generator and $p$ is a secret key. This assumption is necessary for the paricular mix protocol we shall be using.
-\item IP address anonymizer allows unlinkable sessions (this excludes VPNs). The adversary shall not be able to infer that a person who at a given moment is using traffic anonymizer is using it to perform braiding for a given group. Breaking this assumption would allow adversary who spies on the network to do a corealation attacks and thus uncover the owners of the pseudonyms. 
-\item The publically made information is scrutinized, the guardian is made accountable and if neceesary replaced by members on some previously agreed social contract. 
-\end{itemize}
-
-% Synchronized clcocks
-
-
-In a remote electronic voting system the difference between a personalized hardware which does cryptographic operations and the voter starts to get blured. I sci-fi future we may experience cryptographic implants accelrating our brain power on such mundane operations or citizens who are no longer considered humans. In this repect I propose to consider voter as a cryptographicaly capable being who owns pseudonyms and can protect secrets. A way to ensure that the voter does protect his secrets and owns the pseuodnyms is an orthognal issue to the remote electronic voting system, which I shall address later. 
-
-The goal of the braiding protocol is to produce pseuodnyms with high anonimity which can be used to sign votes which would be delivered to voting box over anonymous channel. Considering both braiding and actual voting as a single electronic voting ssytem I claim that it does offer a follwoing properties:
-
-\begin{itemize}
-\item Acountability. The evidence of a ballot conclusevly proves legitimacy, accuracy and fairness of the ballot. Only contoling the voter either in person or through malware adversary can change or vote in place of voter producing a valid evidence. A small adversary coalition can not paralize the voting system without being made accountable and isolated. 
-  
-\item Transparency. The evidence of the ballot is public for anyone to audit without requiring to trust a third party. In other words the evidence can't be produced by a small adversary coalition either during the voting process or after that. 
-  
-\item Privacy. The published evidence does not reveal or allow to infer identities of voters making a certain vote. The voting protocol does not allow adverasary to record additional privacy revealing data without producing a suspicious evidence.
+\item Client software is free from malware/spyware. Breaking this assumption could end up losing the keys of the affected\footnote{Signing and key generation could be done on separate certified hardware which then would protect keys from being extracted.} and would compromise the privacy of the individual;
+\item IP address anonymizer allows unlinkable sessions (this excludes VPNs). The adversary shall not be able to infer that a person who at a given moment, is using traffic anonymizer is using it to perform braiding for a given group. Breaking this assumption would allow an adversary who spies on the network to do correlation attacks and thus uncover the owners of the pseudonyms. 
+\item The publically made information is scrutinized, election officials are made accountable and if necessary, replaced by members on some previously agreed social contract. 
 \end{itemize}
 
 
-For the system we have atwo set of gaols. One with respect to the mebers themselves and the other set is with repsect to the external observers who want to validate that the members do indeed achieve their goals during the braiding protocol and that the anonymized pseudonyms are indeed legitimate without trusitng any agent except the memebers themselves. 
+%First, for accountability, we require that membership can't be lost or stolen to an adversary during the execution of the braiding protocol even if adversary controls, writes code of every other agent in the system (except world). This property can be even achieved if the client hardware has malware as long as a certified device for pseudonym generation and braiding then by API, it can be designed that keys never leave the device. If that happens, a proof against certifier is the device itself.
 
-Particularly for the memebrs there are two goals:
-\begin{itemize}
-\item Membership can't be lost to adversary during the execution of the braiding protocol even if adversary controls, writes code of every other agent in the system (except world). This property can be even achieved if the cleint hardware has malware as long as a certified device for pseuodonym gneration and braiding then by API it can be designed that keys never leaves the device. If that happens a proof against certifier is the device itself.
-\item The anonymity set of newly generated pseudonyms are the union of anonumity sets of coresponding particpnats int the braid if either braider or mix is honest. In case adversary controls both the anonimity set before and after braiding with respect to adversary remains the same. 
-\end{itemize}
+%The transparency is satisfied as the evidence produced in the braiding protocol allows to conclusively prove that current member pseudonyms are a product of the individuals in the rooster who had authorized the pseudonym changes by their previous member pseudonyms. The anonymity set of newly generated pseudonyms are the union of anonymity sets of corresponding participants in the braid if either braider or mix is honest unless adversary controls both and thus the anonymity set before and after braiding for adversary remains the same. The evidence of the braiding also allows evaluating the types of adversary coalition which could have successfully participated in the system to uncover the privacy of the members. To satisfy these goals, we require a following set of assumptions:
 
-In addition even an external observer from the publically available data can infer:
-\begin{itemize}
-\item That the current memeber pseudonyms are a product of the individuals in the rooster who had authorized the pseudonym changes by their previous memeber pseuodnyms. 
-\item The memebership is not stolen by the adversary as long as a particular memeber is malware free, a fake pseudonyms added or an existing memeber removed without being explicit about it.
-\item The anonimity set of each memeber pseudonym and its change uppon if adversary had controlled a particular mix or a set of members. Also evaluate the types of adversary which could have succesfully participated in the system to uncover the privacy of the members. 
-\end{itemize}
 
-Thus to sumarize theese goals the system we shall consider posseses a software independnace while provinding a strong privacy guarantees. It is fully accountable, transparent and privacy preserving.
 
+% The goal of the braiding protocol is to produce pseuodnyms with high anonimity which can be used to sign votes which would be delivered to voting box over anonymous channel. Accountability and transparency make the electroninc voting system software independaent as adversary is not able to produce a valid evidence by controling the execution of the software. First for accountability we require that membership can't be lost or stolen to adversary during the execution of the braiding protocol even if adversary controls, writes code of every other agent in the system (except world). This property can be even achieved if the cleint hardware has malware as long as a certified device for pseuodonym gneration and braiding then by API it can be designed that keys never leaves the device. If that happens a proof against certifier is the device itself.
+
+% The transparcecny is satified as the evidence poroduced in the braiding protocol allows to conclusevly prove that current memeber pseudonyms are a product of the individuals in the rooster who had authorized the pseudonym changes by their previous memeber pseuodnyms. The anonymity set of newly generated pseudonyms are the union of anonumity sets of coresponding particpnats int the braid if either braider or mix is honest unless adversary controls both and thus the anonimity set before and after braiding with respect to adversary remains the same. The evidence of the braiding also allows to evaluate the types of adversary coalition which could have succesfully participated in the system to uncover the privacy of the members.   
+
+% Thus to sumarize theese goals the system we shall consider posseses a software independnace while provinding a strong privacy guarantees. It is fully accountable, transparent and privacy preserving. To satisfy theese goals we require a following set of assumptions:
+
+% \begin{itemize}
+% \item Client software is free from malware/spyware. Breaking this assumption could end up losing the keys of the affected\footnote{Signing and key generation could be done on a seperate certified hardware whhc then would protect keys from being extracted.} and would compromise the privacy of the individual;
+% \item IP address anonymizer allows unlinkable sessions (this excludes VPNs). The adversary shall not be able to infer that a person who at a given moment is using traffic anonymizer is using it to perform braiding for a given group. Breaking this assumption would allow adversary who spies on the network to do a corealation attacks and thus uncover the owners of the pseudonyms. 
+% \item The publically made information is scrutinized, ellection officials are made accountable and if neceesary replaced by members on some previously agreed social contract. 
+% \end{itemize}
+
+
+% In case 
+
+
+%Considering both braiding and actual voting as a single electronic voting ssytem I claim that it does offer a follwoing properties:
+
+%For the system we have atwo set of gaols. One with respect to the mebers themselves and the other set is with repsect to the external observers who want to validate that the members do indeed achieve their goals during the braiding protocol and that the anonymized pseudonyms are indeed legitimate without trusitng any agent except the memebers themselves. 
+
+
+% Wheras for privacy part we require:
+% \begin{itemize}
+% \item 
+% \item The anonimity set of each memeber pseudonym and its change uppon if adversary had controlled a particular mix or a set of members. Also evaluate 
+% \end{itemize}
+
+
+
+% Particularly for the memebrs there are two goals:
+% \begin{itemize}
+% \item 
+
+% \end{itemize}
+
+% In addition even an external observer from the publically available data can infer:
+% \begin{itemize}
+
+% \item The memebership is not stolen by the adversary as long as a particular memeber is malware free, a fake pseudonyms added or an existing memeber removed without being explicit about it.
+
+% \end{itemize}
 
 \subsection*{Agents}
 
-
-The protocol has a different type of agents which we shall describe here and their role to the protocol:
-\begin{itemize}
-\item Guardian - an agent which sets up the system, anounces its parameters and maintains the services, for eample, checks that they are accessable from the interent. 
-\item BraidChain - a guardian delegated agent which is responsable for adding valid member registration transactions from the guardian and adding valid transaction braids from the braider to the transaction log. Provides a service which hosts the transaction log and a service which provides certificates for a braid being added or not going to be added to the transaction log (see the step 7 under authorization). The data on the braidchain is used to calculate a state of the current memebers in the system $S_T \subset P$. 
-\item World - anyone who is interested in observing the integrity of the braidchain by auditing the transactions and receivieng and dealing with complaints in the case of disputes.
-\item Member - a person who owns the pseudonym whose identifier is listed in the current braidchain state $S_T$. The first pseudonym linked to the owners real identitiy is appoved by the guardian and submited to braidchain as registration transaction. In the braiding protocol the member participates in it with its keys of the pseudonyms which are created during execution of braiding protocol and stored locally in a $keychain$ a datastructure with a fixed API for signing messages with its stored keys. 
-\item Braider - a guardian delegated agent which is repsonsible for sucesful execution of the braiding protocol. For sucesful operation the braider operates with multiple states
-  \begin{itemize}
-  \item $S_T$ a set of current memebers according to the braidchain.
-  \item $HOLD \subset S_T$ a set of members which at a given moment are already taking part of the protocol and thus are not eligiable authetificate another time.
-  \item $WaitingList$ a waiting list with a subset of memebers and their established symmetric keys for the session. 
-  \item $Penalty$ a set of members and their penalties expressed in time for thoose which had caused the braiding protocol to fail.
-  \end{itemize}
-\item Mix - a generally trusted agent which provides honest mixing services without leaking mixing permuations to the braider. 
-\end{itemize}
-
-Each agent owns a secret key for the pseudonym identifier which is part of the system. To represent that we shall assume that a method $key(agent)$ is succesful if it is executed on the system which owns the key. 
-
-\subsection*{Public Buletin Board}
-
-For sucesful execution of the protocol every honest participant of the system needs to agree on a set of parameters and primitives used in the protocol. We shall assign guardian for this task which allows to narrow down to an immutable public buletin board which first contains:
-\begin{itemize}
-\item the cryptographic group $CryptoGroup$;
-\item the generator $G \in CryptoGroup$ from the cyryptographic group which is used for asymeteric cryptography - Diffie-Hellman key exchange and electronic signatures;
-\item sign and verify primitive specification;
-\item identifier of the guardian $ID_{guardian} \in CryptoGroup$.
-\end{itemize}
-This allows the guradian to issue the right security parameters by making a on them signature. 
-
-For instance we shall assume that the guardian hosts an entrance point to the system which provides its certified parameters for sucesful execution of the protocol which are:
-\begin{itemize}
-\item A timestamp of parameter distribution.
-\item Identifier of the braider $ID_{braider}$
-\item Identifier of the braidchain $ID_{braidchain}$
-\item A set of pseudonym idetifiers for the mixes $MIXES_{ID}$
-\item The IP address anonymizer, which is the same for a whoole group.
-\item HMAC primitive specification. 
-\item Timeout $T$ at which timestamped information is considered obselete (for simplicity I assume that it is the same for each step of the protocol).
-\item Netwoerk address of the braider, braidchain and mixes on the internet
-\end{itemize}
-All this specification is signed by guardian which thus can be made accountable, for any change made. In addition one may add a application specific parameters, for example, specifically for the voting and etc.
-
-
-\subsection*{Protocol overview}
-
-In this section, we shall look into an implementation of a software-independent braiding protocol which shall allow obtaining close to absolute anonymity for every member. The first part of the protocol is the configuration of services, announcement their configuration on a public bulletin board and registration of members which can happen at any time of the braiding protocol — the person at the top hierarchy who does that we shall call guardian.
-
 \begin{definition}{(guardian)}
-  A guardian is a pseudonym who is on the top of the hierarchy to configure braiding and other services, announce their configuration on a public bulletin board and register new members to the sate $S_T$.
+  A guardian is a pseudonym who is on the top of the hierarchy to configure braiding and other services, checks their availability, announce their configuration on a public bulletin board and register new members to the braidchain.
 \end{definition}
 
 The sate is an outcome of multiple member registrations and their braidings. To audit the protocol, we need to list the transactions in public and append-only bulletin board which contains member registrations issued by the guardian (or subordinate) and braids signed by involved participants.
 
 \begin{definition}{(braidchain)}
-  A braidchain is a public and append-only bulletin board which lists all legitimate transactions which are signed by involved pseudonyms. 
+  A braidchain is a guardian delegated agent which is responsible for adding valid member registration transactions from the guardian and adding valid transaction braids from the braider to the transaction log. Provides a service which hosts the transaction log and a service which provides certificates for a braid being added or not going to be added to the transaction log. The data on the braidchain defines a state of the current members in the system $S_T \subset P$. 
 \end{definition}
 
-In principle, it does not matter who writes the transactions in the braidchain as those upon added are audited. It is, however, much simpler if the guardian and its subordinates only have writing permissions to the braidchain whereas members and everyone else can only read it and audit.
+The braidchain, with its record, defines the member pseudonyms who can participate in the braiding protocol. The first pseudonym linked to the owner's real identity is approved by the guardian and submitted to braidchain as registration transaction. In the braiding protocol, the member participates with its pseudonym in order to produce braid which transfers membership to a new pseudonym generated anonymously within the braid during the protocol execution, which it stores locally. 
 
-The braiding protocol we will look into here is based on a simple mix based electronic voting system which is used to form a ballot from new member-generated pseudonym identifiers. To describe the protocol, we shall assume:
+\begin{definition}{(member)}
+  A member is an agent who owns the pseudonym whose identifier is listed in the current braidchain state $S_T$. 
+\end{definition}
+
+In principle, it does not matter who writes braiding transactions in the braidchain as those upon added are audited. It is, however, much simpler if the guardian and its subordinates only have writing permissions to the braidchain whereas members and everyone else can only read it and audit which we shall refer to as world.
+
+\begin{definition}{(world)}
+  The world is anyone who is interested in observing the integrity of the braidchain by auditing the transactions and receiving and dealing with complaints in the case of disputes.
+\end{definition}
+
+Now lastly, we are set up to define the agent who organizes the braiding between members and its chosen mix service.
+
+\begin{definition}{(braider)}
+  A guardian delegated agent which is responsible for the successful execution of the braiding protocol. For successful operation, the braider operates with multiple states
+  \begin{itemize}
+  \item $S_T$ a set of current members according to the braidchain.
+  \item $HOLD \subset S_T$ a set of members which at a given moment are already taking part of the protocol and thus are not eligible authenticate another time.
+  \item $WaitingList$ a waiting list with a subset of members and their established symmetric session keys. 
+  \item $Penalty$ a set of members and their penalties expressed in time for those which had caused the braiding protocol to fail.
+  \end{itemize}
+\end{definition}
+
+\begin{definition}{(mix)}
+  A mix is a generally trusted agent which provides honest mixing services without leaking permutations to the braider. 
+\end{definition}
+
+Each agent owns a secret key for the pseudonym identifier, which is part of the system. To represent that we shall assume that a method $key(agent)$ is successful if it is executed on the system which owns the key. 
+
+
+% \begin{definition}{(guardian)}
+%   A guardian is a pseudonym who is on the top of the hierarchy to configure braiding and other services, checks their avqailability, announce their configuration on a public bulletin board and register new members to the braidchain.
+% \end{definition}
+
+% The sate is an outcome of multiple member registrations and their braidings. To audit the protocol, we need to list the transactions in public and append-only bulletin board which contains member registrations issued by the guardian (or subordinate) and braids signed by involved participants.
+
+% \begin{definition}{(braidchain)}
+%   % A braidchain is a public and append-only bulletin board which lists all legitimate transactions which are signed by involved pseudonyms.
+%   A guardian delegated agent which is responsable for adding valid member registration transactions from the guardian and adding valid transaction braids from the braider to the transaction log. Provides a service which hosts the transaction log and a service which provides certificates for a braid being added or not going to be added to the transaction log (see the step 7 under authorization). The data on the braidchain defines a state of the current memebers in the system $S_T \subset P$. 
+% \end{definition}
+
+% The braidchain with its record define the memeber pseudonyms who can participate in the braiding protocol. The first pseudonym linked to the owners real identitiy is appoved by the guardian and submited to braidchain as registration transaction. In the braiding protocol the member participates with its pseudoonym in order to produce braid which transfers memebrship to a new pseuodnym generated anonymously with in the braid during the protocl execution which it stores locally. 
+
+% \begin{definition}{(member)}
+%   An agent who owns the pseudonym whose identifier is listed in the current braidchain state $S_T$. 
+% \end{definition}
+
+% In principle, it does not matter who writes braiding transactions in the braidchain as those upon added are audited. It is, however, much simpler if the guardian and its subordinates only have writing permissions to the braidchain whereas members and everyone else can only read it and audit which we shall reffer as world.
+
+% \begin{definition}{(world)}
+%   Anyone who is interested in observing the integrity of the braidchain by auditing the transactions and receivieng and dealing with complaints in the case of disputes.
+% \end{definition}
+
+% Now lastly, we are set up to define the agnet which organizes the braiding between memebers and its choosen mix service
+
+% \begin{definition}{(braider)}
+%   A guardian delegated agent which is repsonsible for sucesful execution of the braiding protocol. For sucesful operation the braider operates with multiple states
+%   \begin{itemize}
+%   \item $S_T$ a set of current memebers according to the braidchain.
+%   \item $HOLD \subset S_T$ a set of members which at a given moment are already taking part of the protocol and thus are not eligiable authetificate another time.
+%   \item $WaitingList$ a waiting list with a subset of memebers and their established symmetric keys for the session. 
+%   \item $Penalty$ a set of members and their penalties expressed in time for thoose which had caused the braiding protocol to fail.
+%   \end{itemize}
+% \end{definition}
+
+% \begin{definition}{(mix)}
+%   A generally trusted agent which provides honest mixing services without leaking mixing permuations to the braider. 
+% \end{definition}
+
+% Each agent owns a secret key for the pseudonym identifier which is part of the system. To represent that we shall assume that a method $key(agent)$ is succesful if it is executed on the system which owns the key. 
+
+\subsection*{Protocol overview}
+
+In this section, we shall look into an implementation of a software-independent braiding protocol which shall allow obtaining close to absolute anonymity for every member. The first part of the protocol is the configuration of services, announcement their configuration on a public bulletin board and registration of members where the later can happen at any time of the braiding protocol. We shall consider a specific braider with one separate mix agent, and we shall assume a following setup:
+
 \begin{itemize}
-\item The pseudonym of the mix and gatekeeper together with other configuration is made public bulletin board which is signed by the guardian;
-\item The guardian registers and keeps registering new members to the braidchain and thus updates the state $S_T$ as braiding protocol proceeds or is repeated;
-\item Each member has the correct guardian identifier to obtain the most recent correct configuration from the bulletin board;
+\item Each member has the correct guardian identifier and configuration and corresponding digital signature configuration, allowing to validate messages signed by the guardian.
+\item The pseudonym of the braider, the agent location on the internet, anonymization service, together with other configuration is signed by the guardian and is published on a public bulletin board;
 \item Each member has an unlimited number of anonymous channels for sending and delivering messages. 
 \end{itemize}
-The last part is significant to prevent linking of newly generated pseudonyms with old ones by keeping track of the IP address used. In practice, a TOR could be used where a new circuit is generated for every single braiding. To simplify the description, we shall not mention details of the key exchange protocol, but say that pseudonym is simply validated, for example, as part of a Diffie-Hellman key exchange protocol which allows establishing a secure connection.
+
+The last part is significant to prevent linking of newly generated pseudonyms with old ones by keeping track of the IP address used. In practice, a TOR could be used where a new circuit is generated for every single braiding. To simplify the description, we shall not mention details of the key exchange protocol, but say that pseudonym is validated, for example, as part of a Diffie-Hellman key exchange protocol which allows establishing a secure connection.
+
+
+% In this section, we shall look into an implementation of a software-independent braiding protocol which shall allow obtaining close to absolute anonymity for every member. The first part of the protocol is the configuration of services, announcement their configuration on a public bulletin board and registration of members where the later can happen at any time of the braiding protocol. We shall consider a specific braider with one seperate mix agent and we shall assume a following setup:
+
+% \begin{itemize}
+% \item Each member has the correct guardian identifier and configuration and coresponding digital signature configuration allowing to validate messages signed by the guardian.
+% \item The pseudonym of the braider, the agent location on the internet, anonimization service, together with other configuration is made public bulletin board and is signed by the guardian;
+% \item Each member has an unlimited number of anonymous channels for sending and delivering messages. 
+% \end{itemize}
+
+% The last part is significant to prevent linking of newly generated pseudonyms with old ones by keeping track of the IP address used. In practice, a TOR could be used where a new circuit is generated for every single braiding. To simplify the description, we shall not mention details of the key exchange protocol, but say that pseudonym is simply validated, for example, as part of a Diffie-Hellman key exchange protocol which allows establishing a secure connection.
 
 \subsubsection*{Authetification}
 
 \begin{itemize}
-\item The gatekeeper connects to the mix and validates that its pseudonym agrees with one specified in the bulletin board (signed by the guardian) and establishes a secure connection. 
-\item A member $m \in S_T$ selects a random time and connects anonymously (through TOR) to the gatekeeper, validates its pseudonym and established a secure connection.
-\item On the other end gatekeeper validates the pseudonym of the client to be in $S_T$, secures the connection and puts it in the waiting list.
-\item When waiting list $W \subset S_T$ contains elements $M \subset W$ which satisfy a guardians specified {\bf condition} the braiding starts with those $M$ members.
+\item The braider connects to the mix and validates that its pseudonym agrees with one specified in the bulletin board (signed by the guardian) and establishes a secure connection. 
+\item A member $m \in S_T$ selects a random time and connects anonymously (through TOR) to the braider, validates its pseudonym and established a secure connection.
+\item On the other end braider validates the pseudonym of the client to be in $S_T$, secures the connection and puts it in the waiting list.
+\item When waiting list $WaitingList \subset S_T$ contains elements $M \subset WaitingList$ which satisfy a guardians specified {\bf condition} the braiding starts with those $M$ members.
 \end{itemize}
 
 The condition entails the number of participants required for a braid, a timeout period for the members who may have caused the previous braiding procedure to fail, and also a strategy which prevents for an adversary to use a small member coalition to unveil the gained anonymity as discussed in the previous section.
@@ -325,64 +491,222 @@ The condition entails the number of participants required for a braid, a timeout
 \subsubsection*{Braiding}
 
 \begin{itemize}
-\item Each member connects through the gatekeeper to the mix, validates its pseudonym to be in the guardian maintained bulletin board and establishes a secure connection.
+\item Each member connects through the braider to the mix, validates its pseudonym to be in the guardian maintained bulletin board and establishes a secure connection.
 \item Each member generates a pseudonym $q \in P$ in secret, stores its key (ownership) and sends the identifier to the mix.
-\item On the other end the mix collects $|M|$ messages, sorts them and sends the resulting list back to the gatekeeper.
-\item The gatekeeper receives the list, reinterprets that as a set of pseudonyms $Q \subset P$ and forms a braid.
+\item On the other end the mix collects $|M|$ messages, sorts them and sends the resulting list back to the braider.
+\item The braider receives the list, reinterprets that as a set of pseudonyms $Q \subset P$ and forms a braid.
 \end{itemize}
 
-As the braiding protocol did not produce any anonymity revealing information for external or internal parties as long as gatekeeper and mix do not collaborate, the anonymity set of each pseudonym in the list $q \in Q$ is $A_{S_T}(q|I) = M$. The last step is to confirm that the procedure was server-side software-independent to guarantee that no participant loses membership.
+As the braiding protocol did not produce any anonymity revealing information for external or internal parties as long as braider and mix do not collaborate, the anonymity set of each pseudonym in the list $q \in Q$ is $A_{S_T}(q|I) = M$. The last step is to confirm that the procedure was server-side software-independent to guarantee that no participant loses membership.
 
 \subsubsection*{Authorization}
 
 \begin{itemize}
-\item The gatekeeper sends the braid to every participant $m \in M$.
-\item Each participant $m \in M$ checks that his secretly generated pseudonym $q \subset P$ is listed in the braid $q \in Q$. If that is true makes the signature of the braid with $m$ and sends it back to the gatekeeper.
-\item If braiding is successful, each member $m \in M$ delivers signature to the gatekeeper who forms a transaction and publishes that to braidchain. That officially announces the state change $S_T \to S_{T+1} = (S_T \setminus M) \cup Q$.
-\item As the members synchronize with braidchain, the new braids are audited for a membership transfer of his owned pseudonyms $O \subset P$. An index is built locally for the state index $T_{grant}$ which grants membership for a pseudonym $o \in O$ and a state index $T_{trans}$ which transfers the membership. 
+\item The braider sends the braid to every participant $m \in M$.
+\item Each participant $m \in M$ checks that his secretly generated pseudonym $q \subset P$ is listed in the braid $q \in Q$. If that is true makes the signature of the braid with $m$ and sends it back to the braider.
+\item If braiding is successful, each member $m \in M$ delivers signature to the braider who forms a transaction and publishes that to braidchain. That officially announces the state change $S_T \to S_{T+1} = (S_T \setminus M) \cup Q$.
+\item As the members and world synchronize with braidchain, the new braids are audited for a membership transfer of his owned pseudonyms $O \subset P$. An index is built locally for the state index $T_{grant}$ which grants membership for a pseudonym $o \in O$ and a state index $T_{trans}$ which transfers the membership. 
 \end{itemize}
 
 The result is that the member makes a secret map between the state number $T$ and his owned pseudonyms $o \in O$. The last granted pseudonym can be used again repeating the braiding procedure which enlarges anonymity set in every braid according to \cref{eq:1} which on average would require about a logarithmic number of braidings to get absolute anonymity with respect to a roster as evaluated in \cref{eq:2}. In practice, the member repeats the braiding protocol until a guardian specified anonymity set size threshold is reached, which then allows it to participate, for example, in voting.
 
 
+\subsection*{Properties}
+
+
+To give the claimed properties of the protocol, we shall define an honest and responsible agent in the context of the protocol:
+\begin{definition}{(honest agent)}
+  An agent who does not deviate from the braiding protocol is free from spyware, and its clock is synchronized with a global time.
+\end{definition}
+\begin{definition}{(responsable agent)}
+  An agent who store safely their owned pseudonym keys and identifiers unaccessible to adversary.
+\end{definition}
+With these definitions in place, I can state the claimed properties of the protocol in a finer precision:
+\begin{itemize}
+\item Honest and responsible member after participating in the braiding will always remain a member.
+\item If either braider or mix is honest the anonymity set after successful braiding is the union of participating member's anonymity sets.\footnote{Otherwise for an adversary who gains information it remains the same.}
+\item If every participating agent in the braiding is honest, the protocol always succeeds.
+\item Dishonest agents can always be isolated and made accountable. 
+\item Produced evidence as braidchain transaction log allows anyone to check that each honest and responsible member is legitimate to participate in further braiding.
+\item The braidchain allows to estimate potential adversary coalitions for each member which could have been capable of breaching his/her privacy.
+%\item Observers can be put in place to monitor agents of honest execution of the protocol during its execution. 
+\end{itemize}
+Also, an attractive property is that eavesdroppers can be made as useful observers to audit agents of honest execution of the protocol, which is possible as messages between agents do not need to be encrypted. For example, that legitimate members can authentificate with the braider, that mixing is happening accurately at both ends and also allows to learn whether member or braider/mix was faulty for unsuccessful execution of the protocol.
+
+
+% To give the clainmed properties of the protocol we shall define honest and responsable agent in the context of the protocol:
+% \begin{definition}{(honest agent)}
+%   Agent who does not deviate from the braiding protocol, is free from spyware and its clock is synchronized with a global time.
+% \end{definition}
+% \begin{definition}{(responsable agent)}
+%   Agent who store safely their owned pseudonym keys and identifiers unaccesabble to adversary.
+% \end{definition}
+% With theese definitions in place I can state the claimed properties of the procol in finer precission:
+% \begin{itemize}
+% \item Honest and responsible member after participating in the braiding will always remain a member.
+% \item If either braider or mix is honest the anonimity set after sucesful braiding is union of participating member's anonimity sets.\footnote{Otherwise with respect to adversary who gains information it remains the same.}
+% \item If every participating agent in the braiding is honest the protocol always succeeds.
+% \item Dishonest agents can always be isolated and made accoutnable. 
+% \item Produced evidence as braidchain transaction log allows anyone to check that each honest and responsable member is legitimate to participate in further braiding and that it had not introduced or dropped memebers.
+% \item The braidchain allows to estimate potential adversary coalitions for each memeber which could have been capable to breach privacy.
+% %\item Observers can be put in place to monitor agents of honest execution of the protocol during its execution. 
+% \end{itemize}
+% Also an interesting property is that evasdropers can be made as useful observers to audit agents of honest execution of the prtocol whihc is possible as messages between agents does not need to be encrypted. For example, that legitimate memebers are able to authentificate with the braider, that mixing is happening accuratelly at both ends and also allows to learn whether member or braider was faulty for unsecesful execution of the protocol
+
+
 \section*{Detailed description of the braiding protocol}
 
 
+\framebox{%
+  \begin{minipage}{0.95\textwidth}
+    {\bf Braiding Protocol} \\
 
+    {\bf Secrets}: Each participating member gnerates a random secret integer $p_i$\\
+    {\bf Private Inputs}: Each participating member makes an input $G^{p_i}$\\
+    {\bf Common Input}: blockhash of the braidchain, braid creation time, mix identifier\\
+    {\bf Common Output}: braid transaction, braid record certificate
+  \end{minipage}}
+
+\begin{doublespace}
+
+  
+\end{doublespace}
+
+For the protocol, we shall employ the following set of assumptions:
 \begin{itemize}
-\item $id(p)$ where $p$ is a pseudonym owner or a signature.
-\item $key(p)$ returns a key if the command is executed on a system which owns the key
-\item $||$ concatenites two objects into one
-\item $sign(msg, key(p))$ issues a signature of the message with a pseudonym $id(p)$
-\item $verify(msg, id(p))$ verifies a signature and returns ${1, 0}$ 
-\item $rngint()$ returns a random integer
-\item $HMAC(msg, key)$ returns authorization HMAC for a message for a key.
-\item $A \to B: Msg$ An ordinary BAN notation
-\item $A \overset{C}{\to} B: Msg$ a Msg which is transfered over an anonymous network with circuit $C$.
-\item $newcircuit()$ generates a new circuit for anonymous messaging.
-\item $sort(R)$ where $R \subset CryptoGroup$. Returns a sorted list of the gnerators in the set $R$.
-\item $\left\{ MSG \right\}_K$. Sends a message which is HMAC authorized with a symmstric key $K$. In contrast to BAN usual notation there is no need for an encryption in the protocol.
-%\item $generate!(kc, Q) \to G^p, Q^p$ where $kc \in KeyChain$ and $Q \in CryptoGroup$. Generates a pseudonym with a key $p$ which si stored in the keychain $kc$ and returns a pseudonym identifier $G^p$ and its encryption $Q^p$. 
-\item $braidset(W, B, P)$ where $W$ is a subset of memerbers $W \subset state(B)$, $P$ is a penalty list and $B$ is the braidchain. Returns a subset of $W$ or $\varnothing$ if the braidset is not sufficient.
-\item $threshold(W, B)$ where $W$ is a subset of memerbers $W \subset state(B)$ and $B$ is a braidchain. A guardian specified algorithm which returns $1$ if the braiding prtocol can continue with a subset of memebers $W$.
-\item $lastbraid(bc)$ where $bc \in BraidChain$. Returns index of the last recorded braid in the braidchain.
-\item $blockhash(bc, N)$ where $bc \in BraidChain$ and $N$ is an index of the braid on the braidchain. Calcualtes and returns a hash of the ledger between the given braid and the next one inclusive.
-%\item $signbraid(braid, ID, kc)$ where $kc \in KeyChain$. Retuns a one time signature of the braid with pseudonym identifier $ID$ whoose key is stored locally in the keychain. For simplicity we shall assume that it is equivalient to $sign("BRAID"||braid, K)$  where $id(K) = ID$.
-\item 
-
+\item Random numbers generated locally are unpredictable.
+\item Each agent has secure means for synchronizing with a global time.
+\item Each member has the correct guardian identifier and corresponding digital signature configuration, allowing to validate messages signed by the guardian. 
+\item IP address anonymizer allows unlinkable (this excludes VPNs) and anonymous sessions.
+\item The publically made information is scrutinized, the guardian is made accountable and if necessary, replaced by members on some previously agreed social contract. 
 \end{itemize}
+The time is mainly introduced in this detailed protocol to allow members to synchronize the outcome of the protocol without revealing any previous state as that can be used for tracking. It also is useful to make guardian accountable on proving that it indeed had connected to a correct mix recently and also allows dismissing replay attacks quicker. 
+
+\begin{figure}[ht]
+  \centering
+\begin{tabular}{l c p{0.7\textwidth}}
+\toprule
+Symbol       &                  & Definition \\
+  \midrule
+ $id(p)$ & & returns identifier of an agent or a signature $p$ \\
+ $key(p)$ & & returns a key if the command is executed on a system which owns the key\\
+ $||$ & & concatenites two objects into one\\
+ $A \to B: Msg$ & & sends messsage $Msg$ from $A$ to $B$ \\
+ $A \overset{C}{\to} B: Msg$ & & a $Msg$ which is transfered over an anonymous network with circuit $C$\\
+ $\left\{ MSG \right\}_K$ & & A message which is HMAC authorized with a symmstric key $K$. In contrast to BAN usual notation there is no need for an encryption in the protocol.\\
+ $G$ & & A generator of a cyclic cryptographic group\\
+ $time()$ & & returns the current time on the agent on which the command is executed\\
+ $rngint()$ & & returns a secret random integer on the agent\\
+ $sort(R)$ & &returns a sorted list of elements in $R$ which can wither be a list or a set\\
+\bottomrule
+\end{tabular}
+\caption{The notations used for describing the braiding protocol.}
+\end{figure}
+We shall use ordinary pseuodnym identifier is $G^s$ where $s$ is a secret key or to parphrase in the notation above $G^{key(p)}=id(p)$. Also we shall assume that all agents uses the same cryptographic primitives. That allows to greatly simplify the protocol without affecting its security properties.
 
 
-\subsection*{Authetification}
+The setup assumes that the guardian publishes cryptographic parameters, specifications and configuration, which is necessary to check the integrity of the braidchain and participate in the braiding protocol. Theses parameters particularly include:
+\begin{itemize}
+\item $G$ a generator for the cryptographic group
+\item $T$ a timeout used for different parts of the protocol\footnote{For simplicity we shall assume that timeout is the same for all steps in the protocol. To break this assumption, one would add an index like $T_i$ at every step where it is used.}
+\item The IP address anonymizer choice for the whole group.
+\item Network addresses of braider, braidchain and mix (optionally) as well as their pseudonym identifiers.
+\item The specification of cryptography primitives and methods which can be executed on any device. Those can be enlisted:
+  \begin{itemize}
+  \item $sign(msg, key(p))$ issues a signature of the message with a pseudonym $id(p)$
+  \item $verify(msg, id(p))$ verifies a signature and returns ${1, 0}$ 
+  \item $hash(msg)$ calculates a hash of $msg$ and returns it as an integer.
+  \item $HMAC(msg, key)$ returns authorization HMAC for a message for a key.
+  \item $newcircuit()$ generates a new circuit for anonymous messaging.
+  \item $braidset(W, B, P)$ where $W$ is a subset of members $W \subset state(B)$, $P$ is a penalty list and $B$ is the braidchain. Returns a subset of $W$ or $\varnothing$ if the set of members in $W$ is not sufficient to form a braid.
+  \item $threshold(W, B)$ where $W$ is a subset of members $W \subset state(B)$ and $B$ is a braidchain. A guardian specified algorithm which returns $1$ if the braiding protocol can continue with a subset of members $W$.
+  \item $lastbraid(bc)$ where $bc \in BraidChain$. Returns index of the last recorded braid in the braidchain.
+  \item $blockhash(bc, N)$ where $bc \in BraidChain$ and $N$ is an index of the braid on the braidchain. Calculates and returns a hash of the ledger between the given braid and the next one inclusive.
+  \end{itemize}
+\end{itemize}
+All this specification is signed by the guardian and published on public bulletin board which in practice could be hosted on the internet as an entrance point. The members would get to this entrance point anonymously at the beginning of the protocol which would prevent a malicious guardian from tracking individuals on their particular parameters used and also make it available for the world to check that the changes are not happening in the configuration too frequently so every honest member can get the same setup.
 
+
+% \framebox{%
+%   \begin{minipage}{0.95\textwidth}
+%     {\bf Braiding Protocol} \\
+
+%     {\bf Secrets}: Each participating member gnerates a random secret integer $p_i$\\
+%     {\bf Private Inputs}: Each participating member makes an input $G^{p_i}$\\
+%     {\bf Common Input}: blockhash of the braidchain, braid creation time, mix identifier\\
+%     {\bf Common Output}: braid transaction, braid record certificate
+%   \end{minipage}}
+
+% \begin{doublespace}
+
+  
+% \end{doublespace}
+
+% For the protocol we shall employ a following assumptions:
+% \begin{itemize}
+% \item Random numbers generated locally are unpredictable.
+% \item Each agent has secure means for synchronizing with a global time.
+% \item Each member has the correct guardian identifier and coresponding digital signature configuration allowing to validate messages signed by the guardian. 
+% \item IP address anonymizer allows unlinkable (this excludes VPNs) and anonymous sessions.
+% \item The publically made information is scrutinized, guardian is made accountable and if neceesary replaced by members on some previously agreed social contract. 
+% \end{itemize}
+% The time is mainly introduced in this detailed protocol to allow memebers to synchronize the outcome of the protocol without revealing any previous state as that can be used for tracking. It also is useful to make guardian accountable on proving that it indeed had connected to a correct mix recently and also allows to dismiss replay attacks quicker. 
+
+% \begin{figure}[ht]
+%   \centering
+% \begin{tabular}{l c p{0.7\textwidth}}
+% \toprule
+% Symbol       &                  & Definition \\
+%   \midrule
+%  $id(p)$ & & where $p$ is a pseudonym owner or a signature. \\
+%  $key(p)$ & & returns a key if the command is executed on a system which owns the key\\
+%  $||$ & & concatenites two objects into one\\
+%  $A \to B: Msg$ & & sends messsage $Msg$ from $A$ to $B$ \\
+%  $A \overset{C}{\to} B: Msg$ & & a $Msg$ which is transfered over an anonymous network with circuit $C$.\\
+%  $\left\{ MSG \right\}_K$ & & A message which is HMAC authorized with a symmstric key $K$. In contrast to BAN usual notation there is no need for an encryption in the protocol.\\
+%  $G$ & & A generator of a cyclic cryptographic group.\\
+%  $time()$ & & returns the current time on the agent on which the command is executed.\\
+%  $rngint()$ & & returns a secret random integer on the agent.\\
+%  $sort(R)$ & &returns a sorted list of elements in $R$ which can wither be a list or a set.\\
+% \bottomrule
+% \end{tabular}
+% \caption{The notations used for describing the braiding protocol.}
+% \end{figure}
+% We shall use ordinary pseuodnym identifier is $G^s$ where $s$ is a secret key or to parphrase in the notation above $G^{key(p)}=id(p)$. Also we shall assume that all agents uses the same cryptographic primitives. That allows to greatly simplify the protocol without affecting its security properties.
+
+
+% The setup assumes that the guardian publishes cryptographic parameters, specifications and configuraion which is necessary to check integrity of the braidchain and partcipate in the braiding protocol. Theses parameters particularly include:
+% \begin{itemize}
+% \item $G$ a generator for the cryptographic group
+% \item $T$ a timeout used for different parts of the protocol\footnote{For simplicity we shall assume that timeout is the same for all steps in the protocol. To break this assumption one would add an index like $T_i$ at every step where it is used.}
+% \item The IP address anonimizer choice for the whoole group.
+% \item Network addresses of braider, braidchain and mix (optionally) as well as their pseudonym identifiers.
+% \item The specification of cryptography primitives and methods which can be executed on any device. Thoose can be enlisted:
+%   \begin{itemize}
+%   \item $sign(msg, key(p))$ issues a signature of the message with a pseudonym $id(p)$
+%   \item $verify(msg, id(p))$ verifies a signature and returns ${1, 0}$ 
+%   \item $hash(msg)$ calculates hash of $msg$ and returns it as an integer.
+%   \item $HMAC(msg, key)$ returns authorization HMAC for a message for a key.
+%   \item $newcircuit()$ generates a new circuit for anonymous messaging.
+%   \item $braidset(W, B, P)$ where $W$ is a subset of memerbers $W \subset state(B)$, $P$ is a penalty list and $B$ is the braidchain. Returns a subset of $W$ or $\varnothing$ if the braidset is not sufficient.
+%   \item $threshold(W, B)$ where $W$ is a subset of memerbers $W \subset state(B)$ and $B$ is a braidchain. A guardian specified algorithm which returns $1$ if the braiding prtocol can continue with a subset of memebers $W$.
+%   \item $lastbraid(bc)$ where $bc \in BraidChain$. Returns index of the last recorded braid in the braidchain.
+%   \item $blockhash(bc, N)$ where $bc \in BraidChain$ and $N$ is an index of the braid on the braidchain. Calcualtes and returns a hash of the ledger between the given braid and the next one inclusive.
+%   \end{itemize}
+% \end{itemize}
+% All this specification is signed by guardian and published on public buletin board which in practice could be hosted on the internet as an entrance point. The members would get to this entraince point anonymously at the bgining of the protocol which would prevent a malicious guardian to track individuals on their particular parameters used and also make it available for world to check that the changes are not happening in the configuration too frequently for making every honest member to get the same setup.
+
+
+
+\subsection*{Authetication}
 
 \begin{steps}
-\item $(Member \to Braider)$ Member $m \in P$ whoose identifier is in the present state of the braidchain $id(m) \in S_T$ generates a random integer $a \leftarrow {\rm rngint}()$, calculates $A \leftarrow G^a$, sets timestamp $t_a \leftarrow {\rm time}()$, isues a signature $s_a \leftarrow {\rm sign}( A || t_a, {\rm key}(m))$. Generates a circuit for anonymous messaging $C \leftarrow {\rm newcircuit}()$ and sends a following message through the circuit to the braider:
+\item $(Member \to Braider)$ Member $m \in P$ whose identifier is in the present state of the braidchain $id(m) \in S_T$ generates a random integer $a \leftarrow {\rm rngint}()$, calculates $A \leftarrow G^a$, sets timestamp $t_a \leftarrow {\rm time}()$, isues a signature $s_a \leftarrow {\rm sign}( A || t_a, {\rm key}(m))$. Generates a circuit for anonymous messaging $C \leftarrow {\rm newcircuit}()$ and sends a following message through the circuit to the braider:
   \begin{equation}
     Member \overset{C}{\to} Braider: A, t_a, s_a  
   \end{equation}
 
-\item $(Braider \to Member)$ Checks that $|t_a - {\rm time}()| < T$, ${\rm id}(s_a) \in S_T \setminus H$, ${\rm verify}(A||t_a,s_a) = 1$. Generates a random integer $b \leftarrow {\rm rngint}()$, calculates $B \leftarrow G^b$, sets timestamp $t_b \leftarrow {\rm time}()$, issues a signature $s_b \leftarrow  {\rm sign}(B || t_b, {\rm key}(braider))$. Derives a symmetric key $K_{ab} \leftarrow A^b$, calculates a hmac $h_{ba} \leftarrow {\rm HMAC}(B||A,K_{ab})$. Sends a following message to the member:
+\item $(Braider \to Member)$ Checks that $|t_a - {\rm time}()| < T$, ${\rm id}(s_a) \in S_T \setminus Hold_T$, ${\rm verify}(A||t_a,s_a) = 1$. Generates a random integer $b \leftarrow {\rm rngint}()$, calculates $B \leftarrow G^b$, sets timestamp $t_b \leftarrow {\rm time}()$, issues a signature $s_b \leftarrow  {\rm sign}(B || t_b, {\rm key}(braider))$. Derives a symmetric key $K_{ab} \leftarrow A^b$, calculates a hmac $h_{ba} \leftarrow {\rm HMAC}(B||A,K_{ab})$. Sends a following message to the member:
   \begin{equation}
     Braider \overset{C}{\to} Member: B, t_b, s_b, h_{ba}
   \end{equation}
@@ -392,7 +716,7 @@ The result is that the member makes a secret map between the state number $T$ an
     Member \overset{C}{\to} Braider: h_{ab}
   \end{equation}
 
-\item $(Braider)$ Cheks that $h_{ab} = {\rm HMAC}(A||B, K_{ab})$. Adds the connection to the waiting list $W_{T+1} \to W_T \cup \left\{ ({\rm id}(s_a), K_{ab}) \right\}$ and pseudonym identifier to the holad $H_{T+1} \to H_T \cup \{ {\rm id}(s_a)\}$. Calculates a braid set from the members in the waiting list $B_{set} \leftarrow {\rm braidset}(W, S_T, P)$. If $B_{set}\not\subset \varnothing$ the braider proceeds to the braiding part. Otherwise waits for another memeber to join.
+\item $(Braider)$ Cheks that $h_{ab} = {\rm HMAC}(A||B, K_{ab})$. Adds the connection to the waiting list $WaitingList_{T+1} \to WaitingList_T \cup \left\{ ({\rm id}(s_a), K_{ab}) \right\}$ and pseudonym identifier to the hold $Hold_{T+1} \to Hold_T \cup \{ {\rm id}(s_a)\}$. Calculates a braid set from the members in the waiting list $B_{set} \leftarrow {\rm braidset}(WaitingList_{T+1}, S_T, Penalty)$. If $B_{set}\not\subset \varnothing$ the braider proceeds to the braiding part. Otherwise waits for another member to join.
 \end{steps}
 
 \subsection*{Braiding}
@@ -410,22 +734,22 @@ The result is that the member makes a secret map between the state number $T$ an
   \begin{equation}
     Mix \to Braider: h_{qd}
   \end{equation}
-\item $(Braider \overset{C}{\to} \forall B_{set})$ Checks received hamc $h_qd = {\rm HMAC}(Q||D,K_{dq})$. Forwards to every participant of $B_{set}$ parameters received from the mix:
+\item $(Braider \overset{C}{\to} \forall B_{set})$ Checks received hmac $h_{qd} = {\rm HMAC}(Q||D,K_{dq})$. Forwards to every participant of $B_{set}$ parameters received from the mix:
   \begin{equation}
     Braider \overset{C}{\to} \forall B_{set}: \left\{ Q, t_q, s_q \right\}_{K_{ab}}
   \end{equation}
   
-\item $(\forall B_{set} \to Braider)$ Checks that $|t_q - {\rm time}()|<T$, ${\rm id}(s_q)={\rm id}(mix)$, ${\rm verify}(Q||t_q, s_q) = 1$. Gnereates a new pseudonym $p={\rm randint}()$ and calcualtes $P \leftarrow G^p$, $X \leftarrow P \cdot Q$. Sends the encryption $X$ to the braider:
+\item $(\forall B_{set} \to Braider)$ Checks that $|t_q - {\rm time}()|<T$, ${\rm id}(s_q)={\rm id}(mix)$, ${\rm verify}(Q||t_q, s_q) = 1$. Gnereates a new pseudonym $p \leftarrow {\rm randint}()$ and calcualtes $P \leftarrow G^p$. Selects a random element from a group $K \leftarrow G^{{\rm randint}()}$ and calculates $X \leftarrow K \cdot Q$, $Y \leftarrow P^{{\rm hash}(K)}$. Sends the encrypted key $X$ and encrypted pseuodnym identifier $Y$ to the braider:
   \begin{equation}
-    \forall B_{set} \overset{C}{\to} Braider: \left\{ X \right\}_{K_{ab}}
+    \forall B_{set} \overset{C}{\to} Braider: \left\{ X , Y \right\}_{K_{ab}}
   \end{equation}
   
-\item $(Braider \to Mix)$ Receives a set pseudonym identifier encryptions $\left\{ X_k \right\}$ from $B^*_{set} \subset B_{set}$. If ${\rm threshold}(B^*_{set})=1$ is satisfied the braiding protocol continues with $B^*_{set}$. Forms a secret ballot by sorting the pseuodnym encryptions $SecretBallot \leftarrow {\rm sort}(\left\{ X_k \right\})$ and sends that to the mix:
+\item $(Braider \to Mix)$ Receives a set of pseudonym identifier encryptions $\left\{ X_k, Y_k \right\}$ from $B^*_{set} \subset B_{set}$. If ${\rm threshold}(B^*_{set})=1$ is satisfied the braiding protocol continues with $B^*_{set}$. Forms a secret ballot by sorting the pseuodnym encryptions $SecretBallot \leftarrow {\rm sort}(\left\{ X_k, Y_k \right\})$ and sends that to the mix:
   \begin{equation}
     Braider \to Mix: \left\{ SecretBallot  \right\}_{K_{dq}}
   \end{equation}
 
-\item $(Mix \to Braider)$ For each encryption $X_k \in SecretBallot$ calculates a coresponding pseuodnym $P_k \leftarrow X_k^{N - q}$ where $N$ is the order of the group $G$. Forms a ballot $Ballot \leftarrow {\rm sort}(P_k)$ and sends it back to to the braider:
+\item $(Mix \to Braider)$ For each encryption $(X_k, Y_k) \in SecretBallot$ calculates a coresponding key $K_k \leftarrow X_k^{N - q}$ and decrypts the pseudonym identifier $P_k \leftarrow Y^{N - {\rm hash}(K_k)}$ where $N$ is the order of the group $G$. Forms a ballot $Ballot \leftarrow {\rm sort}(P_k)$ and sends it back to to the braider:
   \begin{equation}
     Mix \to Braider: \left\{ Ballot \right\}_{K_{dq}}
   \end{equation}
@@ -436,106 +760,265 @@ The result is that the member makes a secret map between the state number $T$ an
 
 \begin{steps}
 \item $(Braider \to \forall B^*_{set})$ Calculates the hash of the braidchain \\ $H_{BC} \leftarrow
-  {\rm blockhash}(braidchain, {\rm lastbraid}(braidchain))$, sets a timestamp $t_{br} \leftarrow {\rm time}()$, and foms a $braid \leftarrow (H_{BC}, t_{br}, ID_{mix}, Ballot)$. Sends that to each paticipant from the $B^*_{set}$:
+  {\rm blockhash}(braidchain, {\rm lastbraid}(braidchain))$, sets a timestamp $t_{br} \leftarrow {\rm time}()$, and foms a $Braid \leftarrow (H_{BC}, t_{br}, ID_{mix}, Ballot)$. Sends that to each paticipant from the $B^*_{set}$:
   \begin{equation}
     Braider \overset{C}{\to} \forall B^*_{set}: \left\{ H_{BC}, ID_{mix}, t_{br}, Ballot \right\}_{K_{ab}}
   \end{equation}
-\item $(\forall B^*_{set} \to Braider)$ Checks that ${\rm id}(mix) = ID_{mix}$, $|t_{br} - {\rm time}()|<T$ and that $P \in Ballot$. Issues a signature of the braid $s_{braid} \leftarrow {\rm sign}(braid, {\rm key}(m))$. Sends the signature to the braider:
+\item $(\forall B^*_{set} \to Braider)$ Checks that ${\rm id}(mix) = ID_{mix}$, $|t_{br} - {\rm time}()|<T$ and that $P \in Ballot$. Issues a signature of the braid $s_{Braid} \leftarrow {\rm sign}(Braid, {\rm key}(m))$. Sends the signature to the braider:
   \begin{equation}
-    \forall B^*_{set} \overset{C}{\to} Braider : \left\{ s_{braid} \right\}_{K_{ab}}
+    \forall B^*_{set} \overset{C}{\to} Braider : s_{Braid} %\left\{ s_{braid} \right\}_{K_{ab}}
   \end{equation}
 
-\item $(Braider \to BraidChain)$ Checks that ${\rm id}(s_{braid})={\rm id}(s_A)$, ${\rm verify}(braid, s_{braid})=1$. Recieves a valid $s_{braid}$ from every $B^{**}_{set} \subset B^*_{set}$. If succesful $B^{**}_{set} = B^{*}_{set}$ and a contract is formed from all received signatures $contract \leftarrow \left\{ s^k_{braid} \right\}$ else $B^{*}_{set} \setminus B^{**}$ are added to the penalty list $Penalty$. Submits the braid transaction to the braidchain:
+\item $(Braider \to BraidChain)$ Checks that ${\rm id}(s_{Braid})={\rm id}(s_A)$, ${\rm verify}(Braid, s_{Braid})=1$. Recieves a valid $s_{Braid}$ from every $B^{**}_{set} \subset B^*_{set}$. If succesful $B^{**}_{set} = B^{*}_{set}$ and a contract is formed from all received signatures $Contract \leftarrow \left\{ s^k_{Braid} \right\}$ else $B^{*}_{set} \setminus B^{**}$ are added to the penalty list $Penalty$. Submits the braid transaction to the braidchain:
   \begin{equation}
-    Braider \to BraidChain: braid, contract
+    Braider \to BraidChain: Braid, Contract
   \end{equation}
 
-\item $(BraidChain \to World)$ If transaction is valid (see section on BraidChain) the transaction is appended to the braidchain which authorizes a state transition $S_{T+1} \to (S_T \setminus B^*_{set}) \cup Ballot$. Distributes new transactions to the world which audits them.  %Returns the $row$ at which the transaction is recorded on the braidchain together with a signature issued by braider $s_{braider} \leftarrow {\rm sign}(row||contract, {\rm key}(braider))$:
+\item $(BraidChain \to World)$ If braid transaction is valid (see below) it is appended to the braidchain which authorizes a state transition $S_{T+1} \to (S_T \setminus B^*_{set}) \cup Ballot$. Distributes new transactions to the world which audits them.  %Returns the $row$ at which the transaction is recorded on the braidchain together with a signature issued by braider $s_{braider} \leftarrow {\rm sign}(row||contract, {\rm key}(braider))$:
   % \begin{equation}
   %   Braider \to \forall B^*_{set}: \left\{row, contract, s_{bc} \right\}_{K_{ab}}
   % \end{equation}
   
 \end{steps}
 
+\framebox{%
+  \begin{minipage}{0.95\textwidth}
+    {\bf Braid Transaction} \\
+    Is a result of verified multiparty computation where where subset of members $M \subset S_T$ produce an output $(Braid,Contract)$ such that:
+    \begin{itemize}
+    \item $Braid.h_{BC}$ is a valid hash of the braidchain $verify(braidchain, Braid.h_{BC})=1$;
+    \item $length(Braid.Ballot) = length(Contract) = length(\{id(s) | s\in Contract\})$;
+    \item For each signature $s \in Contract$ the $id(s)\in M$, $verify(Braid, s)=1$; %where $braid \leftarrow (h_{BC}, t_{br}, ID_{mix}, ballot)$.
+    \end{itemize}
+    which to be considered valid must be recorded in braidchain before $t_{br} + 2T$.
+  \end{minipage}}
+
 \subsection*{Synchronization}
+
+If the braiding protocol is aborted before participating member sends a signature on the braid $s_{Braid}$ then the member can now for certain that membership won't be transferred. If the protocol ends for the member by sending a valid signature to the braider (either if it is accepted or not) the membership may or may not be transferred. To clarify this intermediate state member asks braidchain to issue a record certificate on whether particular braid is recorded or won't be recorded in the future. 
 
 \begin{steps}
 
-\item $(\forall B^*_{set} \to BraidChain)$ Waits until $t_{br} + 2T < {\rm time}()$. Asks for to the braidchain master whether $braid$ is recorded:
+\item $(\forall B^*_{set} \to BraidChain)$ Waits until $t_{br} + 2T < {\rm time}()$. Asks for to the braidchain master whether $Braid$ is recorded:
   \begin{equation}
-    \forall B^*_{set} \overset{C}{\to} BraidChain: braid
+    \forall B^*_{set} \overset{C}{\to} BraidChain: Braid
   \end{equation}
   
 
-\item $(BraidChain \overset{C}{\to} \forall B^*_{set})$ Sets time $t_{query} \leftarrow {\rm time}()$. Looks into the list of transactions and if $braid$ is part of the list sets a $row \leftarrow K$ else sets it $row \leftarrow 0$. Forms a signature $s_{bc} \leftarrow {\rm sign}(t_{query}||row||braid,{\rm key}(braidchain))$ and sends a following message to the participants from $B^*_{set}$.
+\item $(BraidChain \overset{C}{\to} \forall B^*_{set})$ Checks that $Braid.t_{br} + 2T < {\rm time}()$. Looks into the list of transactions and if $Braid$ is part of it sets a $status \leftarrow 1$ else $status \leftarrow 0$. Forms a signature $s_{bc} \leftarrow {\rm sign}(status||Braid,{\rm key}(braidchain))$ and sends a following message to the participants from $B^*_{set}$.
   \begin{equation}
-    BraidChain \overset{C}{\to} \forall B^*_{set}: t_{query}, row, s_{bc}
+    BraidChain \overset{C}{\to} \forall B^*_{set}: status, s_{bc}
   \end{equation}
   
-\item $(\forall B^*_{set})$ Checks that $t_{br} + 2T < t_{query} < {\rm time}()$, ${\rm id}(s_{bc}) = {\rm id}(braidchain)$, and \\ $verify(t_{query}||row||braid, s_{bc})=1$. The final certificate which ends the protocol is:
-
+\item $(\forall B^*_{set})$ Checks that ${\rm id}(s_{bc}) = {\rm id}(braidchain)$, and $verify(status||Braid, s_{bc})=1$. The final result which ends the protocol is:
   % Stores $(t_{query}, row, braid, s_{bc})$ locally as a proof against the guardian in case of a conflict. If $row>0$ updates the local $index$ at which pseudonym $m$ memebership is transfered to a pseudonym $P$.
 \begin{equation}
- p, P, braid, t_{query}, row, s_{braid}, s_{bc}
+ p, P, Braid, status, s_{Braid}, s_{bc}
 \end{equation}
 
 \end{steps}
 
-Note that in the synchronization step participants can ask to certify arbitrary braids to the braidchain at any time. Thus the protocol always ends up in a definite state. 
+\framebox{%
+  \begin{minipage}{0.95\textwidth}
+   {\bf Braid Record Certificate} \\
+   Is a result of a query made to braidchain on whether a particular braid is recorded in the transaction log and thus giving information whether braiding between multiple involved parties was either succesfull or unsusecful. The braid record certificate contains $(Braid, status, s_{bc})$ where
+   \begin{itemize}
+   \item ${\rm id}(s_{bc}) = {\rm id}(braidchain)$
+   \item ${\rm verify}(status||Braid, s_{bc})=1$
+   \end{itemize}
+   where $status=1$ acknowledges that braid transaction is recorded in the braidchain permanently and $status=0$ that a given braid will not be recorded in braidchain at any time in the future.% and thus braiding was unsuccesful. 
+  \end{minipage}}
+\\
+\\
+The braid record certificate determines whether membership transfer went successful to a new pseudonym. In case $status=0$ membership transfer failed and the member can repeat the braiding protocol with the same pseudonym $m$ whose identifier is thus still in the state ${\rm id}(m)\in S_{T+1}$. On the other hand, if $status=1$ the transaction is recorded to the braidchain permanently and thus the membership is transferred $m \to (p, P)$ and as $P \in S_{T+1}$ with which braiding protocol again can be repeated.
 
-\subsection*{Accountability and conflict resolution}
-
-\subsubsection*{World}
-
-If the braiding goes succesfull the braidchain records and anounces a transaction:
-\begin{equation}
-  h_{BC}, t_{br}, ID_{mix}, ballot, contract
-\end{equation}
-this transaction satisfies a certain properties:
-\begin{itemize}
-\item The hash $h_{BC}$ is a valid hash of the braidchain $verify(braidchain, h_{BC})=1$.
-\item $length(ballot) = length(contract) = length(\{id(s) | s\in contract\})$
-\item For each signature $s \in contract$ the $id(s)\in S_T$, $verify(braid, s)=1$ where $braid \leftarrow (h_{BC}, t_{br}, ID_{mix}, ballot)$.
-\end{itemize}
-
+In case of a conflict situation where braid transaction is recorded, but braidchain had issued a braid record certificate for the transaction not to be recorded in the future and vice versa, the member can announce publically the last braid certificate produced. That gives a public proof of security breach in braidchain service for which guardian is accountable. 
 
 
-\subsubsection*{Member}
+% \subsection*{Authetification}
 
-If member had sent a signature on the $braid$ he/she obtains a follwoing certificate which decides whether braiding was succesfull and membership is transfered to a new pseudonym: 
+% \begin{steps}
+% \item $(Member \to Braider)$ Member $m \in P$ whoose identifier is in the present state of the braidchain $id(m) \in S_T$ generates a random integer $a \leftarrow {\rm rngint}()$, calculates $A \leftarrow G^a$, sets timestamp $t_a \leftarrow {\rm time}()$, isues a signature $s_a \leftarrow {\rm sign}( A || t_a, {\rm key}(m))$. Generates a circuit for anonymous messaging $C \leftarrow {\rm newcircuit}()$ and sends a following message through the circuit to the braider:
+%   \begin{equation}
+%     Member \overset{C}{\to} Braider: A, t_a, s_a  
+%   \end{equation}
 
-\begin{equation}
- p, P, h_{BC}, t_{br}, ID_{mix}, ballot, t_{query}, row, s_{braid}, s_{bc}
-\end{equation}
+% \item $(Braider \to Member)$ Checks that $|t_a - {\rm time}()| < T$, ${\rm id}(s_a) \in S_T \setminus H$, ${\rm verify}(A||t_a,s_a) = 1$. Generates a random integer $b \leftarrow {\rm rngint}()$, calculates $B \leftarrow G^b$, sets timestamp $t_b \leftarrow {\rm time}()$, issues a signature $s_b \leftarrow  {\rm sign}(B || t_b, {\rm key}(braider))$. Derives a symmetric key $K_{ab} \leftarrow A^b$, calculates a hmac $h_{ba} \leftarrow {\rm HMAC}(B||A,K_{ab})$. Sends a following message to the member:
+%   \begin{equation}
+%     Braider \overset{C}{\to} Member: B, t_b, s_b, h_{ba}
+%   \end{equation}
+
+% \item $(Member \to Braider)$ Checks that $|t_b - {\rm time}()| < T$, ${\rm id}(s_b)={\rm id}(braider),$ ${\rm verify}(B||t_b,s_b)=1$. Derives a symmetric key $K_{ab} \leftarrow B^a$ and checks the recieved hmac $h_{ba} = {\rm HMAC}(B||A,K_{ab})$. Calculates a hmac $h_{ba} \leftarrow {\rm HMAC}(A||B,K_{ab})$ and sends a following message to the braider:
+%   \begin{equation}
+%     Member \overset{C}{\to} Braider: h_{ab}
+%   \end{equation}
+
+% \item $(Braider)$ Cheks that $h_{ab} = {\rm HMAC}(A||B, K_{ab})$. Adds the connection to the waiting list $W_{T+1} \to W_T \cup \left\{ ({\rm id}(s_a), K_{ab}) \right\}$ and pseudonym identifier to the holad $H_{T+1} \to H_T \cup \{ {\rm id}(s_a)\}$. Calculates a braid set from the members in the waiting list $B_{set} \leftarrow {\rm braidset}(W, S_T, P)$. If $B_{set}\not\subset \varnothing$ the braider proceeds to the braiding part. Otherwise waits for another memeber to join.
+% \end{steps}
+
+% \subsection*{Braiding}
+
+% \begin{steps}
+% \item $(Mix \to Braider)$ Generates a random integer $q \leftarrow {\rm rngint}()$, calculates $Q \leftarrow G^q$, sets a timestamp $t_q \leftarrow {\rm time}()$ and issues a signature $s_q \leftarrow {\rm sign}(Q||t_q, {\rm key}(mix))$. Sends a following message to the braider:
+%   \begin{equation}
+%     Mix \to Braider: Q, t_q, s_q
+%   \end{equation}
+% \item $(Braider \to Mix)$ Checks that $|t_q - {\rm time}()|<T$, ${\rm id}(s_q)={\rm id}(mix)$, ${\rm verify}(Q||t_q, s_q) = 1$. Generates a random integer $d \leftarrow {\rm rngint}()$, calculates $D \leftarrow G^d$ and derives a common key $K_{qd} = Q^d$. Calculates hmac $h_{dq} \leftarrow {\rm HMAC}(D||Q,K_{dq})$ and sends a following message to the mix:
+%   \begin{equation}
+%     Braider \to Mix: D, h_{dq}
+%   \end{equation}
+% \item $(Mix \to Braider)$ Derives a key $K_{dq}=D^q$ and checks the received hmac $h_{dq} = {\rm HMAC}(D||Q,K_{dq})$. Calculates hmac $h_{qd} \leftarrow {\rm HMAC}(Q||D,K_{dq})$ and sends that to the braider:
+%   \begin{equation}
+%     Mix \to Braider: h_{qd}
+%   \end{equation}
+% \item $(Braider \overset{C}{\to} \forall B_{set})$ Checks received hamc $h_{qd} = {\rm HMAC}(Q||D,K_{dq})$. Forwards to every participant of $B_{set}$ parameters received from the mix:
+%   \begin{equation}
+%     Braider \overset{C}{\to} \forall B_{set}: \left\{ Q, t_q, s_q \right\}_{K_{ab}}
+%   \end{equation}
+  
+% \item $(\forall B_{set} \to Braider)$ Checks that $|t_q - {\rm time}()|<T$, ${\rm id}(s_q)={\rm id}(mix)$, ${\rm verify}(Q||t_q, s_q) = 1$. Gnereates a new pseudonym $p \leftarrow {\rm randint}()$ and calcualtes $P \leftarrow G^p$. Selects a random element from $K \leftarrow G^{{\rm randint}()}$ and calculates, $X \leftarrow K \cdot Q$, $Y \leftarrow P^{{\rm hash}(K)}$. Sends the encrypted key $X$ and encrypted pseuodnym identifier $Y$ to the braider:
+%   \begin{equation}
+%     \forall B_{set} \overset{C}{\to} Braider: \left\{ X , Y \right\}_{K_{ab}}
+%   \end{equation}
+  
+% \item $(Braider \to Mix)$ Receives a set pseudonym identifier encryptions $\left\{ X_k, Y_k \right\}$ from $B^*_{set} \subset B_{set}$. If ${\rm threshold}(B^*_{set})=1$ is satisfied the braiding protocol continues with $B^*_{set}$. Forms a secret ballot by sorting the pseuodnym encryptions $SecretBallot \leftarrow {\rm sort}(\left\{ X_k, Y_k \right\})$ and sends that to the mix:
+%   \begin{equation}
+%     Braider \to Mix: \left\{ SecretBallot  \right\}_{K_{dq}}
+%   \end{equation}
+
+% \item $(Mix \to Braider)$ For each encryption $(X_k, Y_k) \in SecretBallot$ calculates a coresponding key $K_k \leftarrow X_k^{N - q}$ and decrypts the pseudonym identifier $P_k \leftarrow Y^{N - {\rm hash}(K_k)}$ where $N$ is the order of the group $G$. Forms a ballot $Ballot \leftarrow {\rm sort}(P_k)$ and sends it back to to the braider:
+%   \begin{equation}
+%     Mix \to Braider: \left\{ Ballot \right\}_{K_{dq}}
+%   \end{equation}
+  
+% \end{steps}
+
+% \subsection*{Authorization}
+
+% \begin{steps}
+% \item $(Braider \to \forall B^*_{set})$ Calculates the hash of the braidchain \\ $H_{BC} \leftarrow
+%   {\rm blockhash}(braidchain, {\rm lastbraid}(braidchain))$, sets a timestamp $t_{br} \leftarrow {\rm time}()$, and foms a $braid \leftarrow (H_{BC}, t_{br}, ID_{mix}, Ballot)$. Sends that to each paticipant from the $B^*_{set}$:
+%   \begin{equation}
+%     Braider \overset{C}{\to} \forall B^*_{set}: \left\{ H_{BC}, ID_{mix}, t_{br}, Ballot \right\}_{K_{ab}}
+%   \end{equation}
+% \item $(\forall B^*_{set} \to Braider)$ Checks that ${\rm id}(mix) = ID_{mix}$, $|t_{br} - {\rm time}()|<T$ and that $P \in Ballot$. Issues a signature of the braid $s_{braid} \leftarrow {\rm sign}(braid, {\rm key}(m))$. Sends the signature to the braider:
+%   \begin{equation}
+%     \forall B^*_{set} \overset{C}{\to} Braider : s_{braid} %\left\{ s_{braid} \right\}_{K_{ab}}
+%   \end{equation}
+
+% \item $(Braider \to BraidChain)$ Checks that ${\rm id}(s_{braid})={\rm id}(s_A)$, ${\rm verify}(braid, s_{braid})=1$. Recieves a valid $s_{braid}$ from every $B^{**}_{set} \subset B^*_{set}$. If succesful $B^{**}_{set} = B^{*}_{set}$ and a contract is formed from all received signatures $contract \leftarrow \left\{ s^k_{braid} \right\}$ else $B^{*}_{set} \setminus B^{**}$ are added to the penalty list $Penalty$. Submits the braid transaction to the braidchain:
+%   \begin{equation}
+%     Braider \to BraidChain: braid, contract
+%   \end{equation}
+
+% \item $(BraidChain \to World)$ If braid transaction is valid (see below) it is appended to the braidchain which authorizes a state transition $S_{T+1} \to (S_T \setminus B^*_{set}) \cup Ballot$. Distributes new transactions to the world which audits them.  %Returns the $row$ at which the transaction is recorded on the braidchain together with a signature issued by braider $s_{braider} \leftarrow {\rm sign}(row||contract, {\rm key}(braider))$:
+%   % \begin{equation}
+%   %   Braider \to \forall B^*_{set}: \left\{row, contract, s_{bc} \right\}_{K_{ab}}
+%   % \end{equation}
+  
+% \end{steps}
+
+% \framebox{%
+%   \begin{minipage}{0.95\textwidth}
+%     {\bf Braid Transaction} \\
+%     Is a result of verified multiparty computation where where subset of members $M \subset S_T$ produce an output $(braid,contract)$ such that:
+%     \begin{itemize}
+%     \item $braid.h_{BC}$ is a valid hash of the braidchain $verify(braidchain, braid.h_{BC})=1$;
+%     \item $length(braid.ballot) = length(contract) = length(\{id(s) | s\in contract\})$;
+%     \item For each signature $s \in contract$ the $id(s)\in M$, $verify(braid, s)=1$; %where $braid \leftarrow (h_{BC}, t_{br}, ID_{mix}, ballot)$.
+%     \end{itemize}
+%     which to be considered valid must be recorded in braidchain before $t_{br} + 2T$.
+%   \end{minipage}}
+
+% \subsection*{Synchronization}
+
+% If teh braiding protocol is aborted before participating memeber sends a signature on the braid $s_{braid}$ then memebr can now for certain that memebership wont be transfered. If the protocol ends for memeebr by sendding a valid signature to the braider (either if it is accepted or not) the memebership may or may not be transfered. To clarify this intermiduate state memeber asks braidchain to issue a record certificate on whether particular braid is recorded or wont be reocirded in the future. 
+
+% \begin{steps}
+
+% \item $(\forall B^*_{set} \to BraidChain)$ Waits until $t_{br} + 2T < {\rm time}()$. Asks for to the braidchain master whether $braid$ is recorded:
+%   \begin{equation}
+%     \forall B^*_{set} \overset{C}{\to} BraidChain: braid
+%   \end{equation}
+  
+
+% \item $(BraidChain \overset{C}{\to} \forall B^*_{set})$ Checks that $braid.t_{br} + 2T < {\rm time}()$. Looks into the list of transactions and if $braid$ is part of the list sets a $status \leftarrow 1$ else sets $status \leftarrow 0$. Forms a signature $s_{bc} \leftarrow {\rm sign}(status||braid,{\rm key}(braidchain))$ and sends a following message to the participants from $B^*_{set}$.
+%   \begin{equation}
+%     BraidChain \overset{C}{\to} \forall B^*_{set}: status, s_{bc}
+%   \end{equation}
+  
+% \item $(\forall B^*_{set})$ Checks that ${\rm id}(s_{bc}) = {\rm id}(braidchain)$, and $verify(status||braid, s_{bc})=1$. The final result which ends the protocol is:
+%   % Stores $(t_{query}, row, braid, s_{bc})$ locally as a proof against the guardian in case of a conflict. If $row>0$ updates the local $index$ at which pseudonym $m$ memebership is transfered to a pseudonym $P$.
+% \begin{equation}
+%  p, P, braid, status, s_{braid}, s_{bc}
+% \end{equation}
+
+% \end{steps}
+
+% \framebox{%
+%   \begin{minipage}{0.95\textwidth}
+%    {\bf Braid Record Certificate} \\
+%    Is a result of a query made to braidchain on whether a particular braid is recorded in the transaction log and thus giving information whether braiding between multiple involved parties was either succesfull or unsusecful. The braid record certificate contains $(braid, status, s_{bc})$ where
+%    \begin{itemize}
+%    \item ${\rm id}(s_{bc}) = {\rm id}(braidchain)$
+%    \item ${\rm verify}(status||braid, s_{bc})=1$
+%    \end{itemize}
+%    where $status=1$ acknowledges that braid transaction is recorded in the braidchain permanently and $status=0$ that a given braid will not be recorded in braidchain at any time in the future.% and thus braiding was unsuccesful. 
+%   \end{minipage}}
+% \\
+% \\
+% The braid record certificate determines whether memebership transfer went succesful to a new pseudonym. In case $status=0$ mebership transfer did not go succesful and the member can repeat the braiding protocol with the same pseudonym $m$ whoose identifier is thus still in the state ${\rm id}(m)\in S_{T+1}$. On the other hand if $status=1$ the transaction is recorded to the braidchain permanently and thus the memebership is transfered $m \to (p, P)$ as $P \in S_{T+1}$ with which braiding protocol again can be repeated.
+
+% In case of a conflict situtations where braid tarnsaction is recorded but braidchain had issued a braid record certificate for the transaction not to be recordeded in the future and vice versa, the member can anoance publically the last braid certificate produced. That gives a public proof of security breach in braidchain service for which guardian is accountable. 
+
+% which guardian can be replaced on a social contract basis. 
+
+% evidence to make guardian accountable 
+
+% pinpoint particular transaction in the braidchain which does not match issued braid record certificate and anoance that 
 
 
-To repeat, this certificate is valid if:
-\begin{itemize}
-\item $P = G^p$
-\item $P \in ballot$
-\item $t_{query} - t_{br} > 2T$
-\item $braid \leftarrow (h_{BC}, t_{br}, ID_{mix}, ballot)$, $id(s_{braid})=id(m)$, $verify(braid, s_{braid})=1$
-\item ${\rm id}(s_{bc}) = {\rm id}(braidchain)$, $verify(t_{query}||row||braid, s_{bc})=1$
-\end{itemize}
+%Note that in the synchronization step participants can ask to certify arbitrary braids to the braidchain at any time. Thus the protocol always ends up in a definite state. 
 
-The value of $row$ determines whether memebership transfer went succesful to a new pseudonym. In case $row=0$ mebership transfer did not go succesful and the member can repeat the braiding protocol with the same pseudonym $m$ whoose identifier is thus still in the state $id(m)\in S_T$. On the other hand if $row>0$ the transaction is recorded to the braidchain to a particular row and thus the memebership is transfered $m \to (p, P)$ as $P \in S_T$ with which braiding protocol again can be repeated.
 
-There may raise two conflict situations in a case the issued certificate does not reflect the state in the braidchain making authetifiaction to fail for the next braiding. In case the membership is transfered then member can publically anounce a certificate:
+%If member had sent a signature on the $braid$ he/she obtains a follwoing certificate which decides 
 
-\begin{equation}
- h_{BC}, t_{br}, ID_{mix}, ballot, t_{query}, row, s_{braid}, s_{bc} 
-\end{equation}
+% \begin{equation}
+%  p, P, h_{BC}, t_{br}, ID_{mix}, ballot, t_{query}, row, s_{braid}, s_{bc}
+% \end{equation}
 
-which proves that a membership to a a psueodnym $P \in ballot$ is granted and must be reflected to braidchain. 
 
-In the opposite situation memebrship is not transfered to a new pseudonym according to issued certificate, but had changed the state in the braidchain. In this situation memeber can anouance all failed braiding certificates issued by the same pseudonym $id(m)=s^i_{braid}$:
+% In case the $s_{braid}$ had been issued such that $id(s_{braid})=id(m)$ and $verify(braid, s_{braid})=1$ the member must obtain a status message 
 
-\begin{equation}
- h^i_{BC}, t^i_{br}, ID^i_{mix}, ballot^i, t^i_{query}, 0, s^i_{braid}, s^i_{bc}
-\end{equation}
+% To repeat, the braiding went succesful if a member after braiding owns a $p$ such that:
+% \begin{itemize}
+% \item $P = G^p$
+% \item $P \in braid.ballot$
+% %\item $braid \leftarrow (h_{BC}, t_{br}, ID_{mix}, ballot)$, $id(s_{braid})=id(m)$, $verify(braid, s_{braid})=1$
+% \item ${\rm id}(s_{bc}) = {\rm id}(braidchain)$
+% \item $verify(1||braid, s_{bc})=1$
+% \end{itemize}
 
-where one of the ballots should contain a valid transaction recorded to the braidchain. In case none of them is the braid which made a valid transaction in the braidchain it could be either becauser the memeber is dishonest or the key had been stolen. To prevent both of thoose cases a certified hardware can be required to be used with a constrained API which does not allow to sign a a braid which does not contain an owned pseydonym.
 
+% There may raise two conflict situations in a case the issued certificate does not reflect the state in the braidchain making authetifiaction to fail for the next braiding. In case the membership is transfered then member can publically anounce a certificate:
+
+% \begin{equation}
+%   braid, s_{bc}
+% % h_{BC}, t_{br}, ID_{mix}, ballot, t_{query}, row, s_{braid}, s_{bc} 
+% \end{equation}
+
+% which proves that a membership to a a psueodnym $P \in ballot$ is granted and must be reflected to braidchain. 
+
+% In the opposite situation memebrship is not transfered to a new pseudonym according to issued certificate, but had changed the state in the braidchain. In this situation memeber can anouance all failed braiding certificates issued by the same pseudonym $id(m)=s^i_{braid}$:
+
+% \begin{equation}
+%  h^i_{BC}, t^i_{br}, ID^i_{mix}, ballot^i, t^i_{query}, 0, s^i_{braid}, s^i_{bc}
+% \end{equation}
+
+% where one of the ballots should contain a valid transaction recorded to the braidchain. In case none of them is the braid which made a valid transaction in the braidchain it could be either becauser the memeber is dishonest or the key had been stolen. To prevent both of thoose cases a certified hardware can be required to be used with a constrained API which does not allow to sign a a braid which does not contain an owned pseydonym.
+
+
+\include{references}
 
 \end{document}
 %%% Local Variables:
